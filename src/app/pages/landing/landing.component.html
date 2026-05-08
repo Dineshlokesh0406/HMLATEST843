@@ -1,0 +1,78 @@
+<section class="panel search-panel">
+  <div class="search-panel-head">
+    <div>
+      <h3>Search Rooms By City</h3>
+      <p class="muted">Choose a city from the database-backed dropdown to filter the room cards below.</p>
+    </div>
+    <label class="city-search-field">
+      <span>Select City</span>
+      <select [ngModel]="selectedCityCode()" (ngModelChange)="updateSelectedCity($event)">
+        <option value="">All cities</option>
+        @for (city of cities(); track city.cityCode) {
+          <option [value]="city.cityCode">{{ city.cityName }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (loading()) {
+    <p class="status-note">Loading rooms...</p>
+  } @else if (loadMessage()) {
+    <p class="status-note">{{ loadMessage() }}</p>
+  } @else if (filteredRooms().length) {
+    <div class="pagination-bar">
+      <p class="muted">Showing {{ pageStart() }} to {{ pageEnd() }} of {{ filteredRooms().length }} rooms</p>
+      <div class="pagination-actions">
+        <button type="button" class="button-secondary" (click)="previousPage()" [disabled]="currentPage() === 1">Previous</button>
+        <span class="page-indicator">Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <button type="button" class="button-secondary" (click)="nextPage()" [disabled]="currentPage() === totalPages()">Next</button>
+      </div>
+    </div>
+
+    <div class="room-list">
+      @for (room of paginatedRooms(); track room.id) {
+        <article class="room-card">
+          <div class="room-card-image-wrap">
+            <img class="room-card-image" [src]="getRoomCardImage(room)" [alt]="room.hotelName" />
+            <span class="room-card-badge">{{ getRoomCardBadge(room) }}</span>
+          </div>
+
+          <div class="room-card-top">
+            <div>
+              <p class="room-city">{{ room.cityName }}</p>
+              <h4>{{ room.hotelName }}</h4>
+              <p class="muted">{{ room.roomType }} | Room {{ room.roomNumber }} | {{ room.bedType }}</p>
+            </div>
+            <div class="room-price">
+              <strong>Rs {{ room.price }}</strong>
+              <span>per night</span>
+            </div>
+          </div>
+
+          <p>{{ room.description }}</p>
+
+          <div class="room-meta">
+            <span>{{ room.available ? 'Available' : 'Fully booked' }}</span>
+            <span>{{ room.maxAdults }} adults</span>
+            <span>{{ room.maxChildren }} children</span>
+            <span>{{ room.size }} sq ft</span>
+          </div>
+
+          <p class="muted"><strong>Amenities:</strong> {{ room.amenities.join(', ') }}</p>
+        </article>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination-bar pagination-footer">
+        <div class="pagination-actions">
+          <button type="button" class="button-secondary" (click)="previousPage()" [disabled]="currentPage() === 1">Previous</button>
+          <span class="page-indicator">Page {{ currentPage() }} of {{ totalPages() }}</span>
+          <button type="button" class="button-secondary" (click)="nextPage()" [disabled]="currentPage() === totalPages()">Next</button>
+        </div>
+      </div>
+    }
+  } @else {
+    <p class="status-note">No rooms found for the selected city.</p>
+  }
+</section>

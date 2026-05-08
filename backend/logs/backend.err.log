@@ -1,0 +1,16 @@
+=root : The term '=root' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ ='root'; ='Arnav@2003'; Set-Location 'C:\Users\Lenovo\Desktop\HM\back ...
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (=root:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+=Arnav@2003 : The term '=Arnav@2003' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:10
++ ='root'; ='Arnav@2003'; Set-Location 'C:\Users\Lenovo\Desktop\HM\back ...
++          ~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (=Arnav@2003:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 

@@ -1,0 +1,44 @@
+<div class="app-shell">
+  @if (showPublicTopbar()) {
+    <header class="customer-nav public-nav panel">
+      <div class="customer-brand public-brand">
+        <div>
+          <h2>LUXE HOTELS</h2>
+          <p>CUSTOMER PORTAL | GUEST</p>
+        </div>
+      </div>
+
+      <nav class="customer-nav-links public-nav-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        <a routerLink="/login" routerLinkActive="active">Login/Register</a>
+      </nav>
+    </header>
+  }
+
+  <main class="page-shell">
+    <router-outlet />
+  </main>
+
+  <footer class="app-footer">
+    <div class="app-footer-inner">
+      <div>
+        <h3>LUXE HOTELS</h3>
+        <p>Smart hotel booking, smooth stays, and customer-first service in one platform.</p>
+      </div>
+
+      <div>
+        <h4>Highlights</h4>
+        <p>City-based hotel discovery</p>
+        <p>Live room booking flow</p>
+        <p>Complaints and booking support</p>
+      </div>
+
+      <div>
+        <h4>Support</h4>
+        <p>support&#64;luxehotels.com</p>
+        <p>+91 1800 123 4567</p>
+        <p>24x7 customer assistance</p>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,5 @@
+.center-panel {
+  display: grid;
+  justify-items: start;
+  max-width: 520px;
+}

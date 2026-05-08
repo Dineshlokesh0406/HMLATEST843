@@ -1,0 +1,61 @@
+<section class="panel portal-header">
+  <div>
+    <h2>Staff Complaint Workspace</h2>
+    <p class="muted">This page lets staff view assigned complaints, add action notes, and update statuses.</p>
+  </div>
+  <button class="button-secondary" type="button" (click)="logout()">Logout</button>
+</section>
+
+<section class="panel">
+  <div class="toolbar">
+    <label>
+      Filter by status
+      <select [(ngModel)]="filterStatus" [ngModelOptions]="{ standalone: true }">
+        <option value="">All</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Resolved">Resolved</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Customer</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Action Notes</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (complaint of complaints; track complaint.complaintId) {
+          <tr>
+            <td>{{ complaint.complaintId }}</td>
+            <td>{{ complaint.userId }}</td>
+            <td>{{ complaint.category }}</td>
+            <td>{{ complaint.priority }}</td>
+            <td>{{ complaint.status }}</td>
+            <td>
+              <textarea rows="2" [(ngModel)]="actionNotes[complaint.complaintId]" [ngModelOptions]="{ standalone: true }"></textarea>
+            </td>
+            <td>
+              <select #statusSelect>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <button class="button-secondary" type="button" (click)="updateStatus(complaint.complaintId, statusSelect.value)">Save</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,75 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.hm:hotel-management-backend >-------------------
+[INFO] Building hotel-management-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.5:run (default-cli) > test-compile @ hotel-management-backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-management-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-management-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ hotel-management-backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Lenovo\Desktop\HM\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ hotel-management-backend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.3.5:run (default-cli) < test-compile @ hotel-management-backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.5:run (default-cli) @ hotel-management-backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-05-06T22:40:14.851+05:30  INFO 43416 --- [hotel-management-backend] [           main] c.h.b.HotelManagementBackendApplication  : Starting HotelManagementBackendApplication using Java 21.0.10 with PID 43416 (C:\Users\Lenovo\Desktop\HM\backend\target\classes started by Lenovo in C:\Users\Lenovo\Desktop\HM\backend)
+2026-05-06T22:40:14.854+05:30  INFO 43416 --- [hotel-management-backend] [           main] c.h.b.HotelManagementBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-05-06T22:40:15.740+05:30  INFO 43416 --- [hotel-management-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-06T22:40:15.763+05:30  INFO 43416 --- [hotel-management-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-06T22:40:15.764+05:30  INFO 43416 --- [hotel-management-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-05-06T22:40:15.813+05:30  INFO 43416 --- [hotel-management-backend] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-06T22:40:15.815+05:30  INFO 43416 --- [hotel-management-backend] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 909 ms
+2026-05-06T22:40:16.228+05:30  WARN 43416 --- [hotel-management-backend] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-06T22:40:16.242+05:30  INFO 43416 --- [hotel-management-backend] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-05-06T22:40:16.256+05:30 ERROR 43416 --- [hotel-management-backend] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.388 s
+[INFO] Finished at: 2026-05-06T22:40:16+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.5:run (default-cli) on project hotel-management-backend: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

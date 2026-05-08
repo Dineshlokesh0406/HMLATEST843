@@ -1,0 +1,709 @@
+<section class="customer-shell">
+  <header class="customer-nav panel">
+    <div class="customer-brand">
+      <h2>LUXE HOTELS</h2>
+      <p>CUSTOMER PORTAL | {{ currentUser()?.userId }}</p>
+    </div>
+
+    <nav class="customer-nav-links">
+      <button type="button" [class.active]="activeSection === 'home'" (click)="setSection('home')">Home</button>
+      <button type="button" [class.active]="activeSection === 'bookings'" (click)="setSection('bookings')">My Bookings</button>
+      <button type="button" [class.active]="activeSection === 'complaints'" (click)="setSection('complaints')">Register Complaint</button>
+      <button type="button" [class.active]="activeSection === 'contact'" (click)="setSection('contact')">Contact Us</button>
+      <button type="button" [class.active]="activeSection === 'profile'" (click)="setSection('profile')">Profile</button>
+      <button type="button" class="logout-link" (click)="requestLogoutConfirmation()">Logout</button>
+    </nav>
+  </header>
+
+@if (activeSection === 'home') {
+  @if (homeStep() === 'listing') {
+    <section class="panel search-panel">
+      <div class="search-panel-head">
+        <div>
+          <h3>Search Hotels by City or Area</h3>
+          <p class="muted">Choose a city to explore hotel cards, then open a hotel to view room categories and continue booking.</p>
+        </div>
+        <label class="city-search-field">
+          <span>Select City</span>
+          <select [ngModel]="selectedHomeCityCode()" (ngModelChange)="updateHomeCity($event)" [ngModelOptions]="{ standalone: true }">
+            <option value="">All cities</option>
+            @for (city of cities; track city.cityCode) {
+              <option [value]="city.cityCode">{{ city.cityName }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (homeLoading()) {
+        <p class="status-note">Loading hotels...</p>
+      } @else if (homeLoadMessage()) {
+        <p class="status-note">{{ homeLoadMessage() }}</p>
+      } @else if (hotelCards().length) {
+        <div class="pagination-bar">
+          <p class="muted">Showing {{ homePageStart() }} to {{ homePageEnd() }} of {{ hotelCards().length }} hotels</p>
+          <div class="pagination-actions">
+            <button type="button" class="button-secondary" (click)="previousHomePage()" [disabled]="homeCurrentPage() === 1">Previous</button>
+            <span class="page-indicator">Page {{ homeCurrentPage() }} of {{ totalHomePages() }}</span>
+            <button type="button" class="button-secondary" (click)="nextHomePage()" [disabled]="homeCurrentPage() === totalHomePages()">Next</button>
+          </div>
+        </div>
+
+        <div class="home-room-list">
+          @for (hotelCard of paginatedHomeRooms(); track hotelCard.hotelCode) {
+            <article class="home-room-card hotel-card">
+              <div class="hotel-card-image-wrap">
+                <img class="hotel-card-image" [src]="getHotelCardImage(hotelCard)" [alt]="hotelCard.hotelName" />
+                <span class="hotel-card-badge">{{ getHotelCardBadge(hotelCard) }}</span>
+              </div>
+
+              <div class="home-room-card-top">
+                <div>
+                  <p class="room-city">{{ hotelCard.cityName }}</p>
+                  <h4>{{ hotelCard.hotelName }}</h4>
+                  <p class="muted">{{ hotelCard.availableRoomCount }} room(s) available | {{ hotelCard.roomTypes.join(', ') }}</p>
+                </div>
+                <div class="room-price">
+                  <strong>Rs {{ hotelCard.startingPrice }}</strong>
+                  <span>starting / night</span>
+                </div>
+              </div>
+
+              <p>{{ hotelCard.description }}</p>
+
+              <div class="room-meta">
+                <span>{{ hotelCard.cityName }}</span>
+                <span>{{ hotelCard.availableRoomCount }} rooms available</span>
+                @for (amenity of hotelCard.amenities; track amenity) {
+                  <span>{{ amenity }}</span>
+                }
+              </div>
+
+              <div class="card-actions">
+                <button class="button-primary" type="button" (click)="openHotelDetails(hotelCard)">View Rooms</button>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if (totalHomePages() > 1) {
+          <div class="pagination-bar pagination-footer">
+            <div class="pagination-actions">
+              <button type="button" class="button-secondary" (click)="previousHomePage()" [disabled]="homeCurrentPage() === 1">Previous</button>
+              <span class="page-indicator">Page {{ homeCurrentPage() }} of {{ totalHomePages() }}</span>
+              <button type="button" class="button-secondary" (click)="nextHomePage()" [disabled]="homeCurrentPage() === totalHomePages()">Next</button>
+            </div>
+          </div>
+        }
+      } @else {
+        <p class="status-note">No hotels found for the selected city.</p>
+      }
+    </section>
+  }
+
+  @if (homeStep() === 'details' && selectedHotelCard(); as hotelCard) {
+    <section class="panel details-header">
+      <div>
+        <p class="room-city">{{ hotelCard.cityName }}</p>
+        <h3>{{ hotelCard.hotelName }}</h3>
+        <p class="muted">{{ hotelCard.description }}</p>
+      </div>
+      <button type="button" class="button-secondary" (click)="backToHotelCards()">Back to Hotel Cards</button>
+    </section>
+
+    <section class="category-grid">
+      @for (category of selectedHotelRoomCategories(); track category.roomType + '-' + category.bedType) {
+        <article class="panel category-card">
+          <div class="home-room-card-top">
+            <div>
+              <h4>{{ category.roomType }}</h4>
+              <p class="muted">{{ category.bedType }} bed | {{ category.availableRooms }} room(s) available</p>
+            </div>
+            <div class="room-price">
+              <strong>Rs {{ category.price }}</strong>
+              <span>per night</span>
+            </div>
+          </div>
+
+          <p>{{ category.description }}</p>
+          <div class="room-meta">
+            @for (amenity of category.amenities; track amenity) {
+              <span>{{ amenity }}</span>
+            }
+          </div>
+
+          <div class="card-actions">
+            <button class="button-primary" type="button" [disabled]="category.availableRooms === 0" (click)="selectRoomCategory(category)">Select Room</button>
+          </div>
+        </article>
+      }
+    </section>
+  }
+
+  @if (homeStep() === 'confirmation' && selectedHotelCard(); as hotelCard) {
+    <section class="panel">
+      <div class="step-header">
+        <div>
+          <p class="room-city">{{ hotelCard.cityName }}</p>
+          <h3>Booking Confirmation</h3>
+          <p class="muted">{{ hotelCard.hotelName }} | {{ selectedRoomCategory()?.roomType }} | {{ selectedRoomCategory()?.bedType }}</p>
+        </div>
+        <button type="button" class="button-secondary" (click)="backToHotelCards()">Change Hotel</button>
+      </div>
+
+      <form [formGroup]="confirmationForm" class="form-grid">
+        <label>
+          Check-in Date
+          <input type="date" formControlName="checkIn" (change)="syncCalculatedAmount()" />
+          @if (confirmationForm.controls.checkIn.touched && confirmationForm.controls.checkIn.invalid) {
+            <span class="error-text">Check-in date cannot be in the past.</span>
+          }
+        </label>
+
+        <label>
+          Check-out Date
+          <input type="date" formControlName="checkOut" (change)="syncCalculatedAmount()" />
+          @if (confirmationForm.controls.checkOut.touched && confirmationForm.controls.checkOut.invalid) {
+            <span class="error-text">
+              {{ confirmationForm.controls.checkOut.errors?.['maxStayDuration'] ? 'Stay duration cannot exceed 14 days.' : 'Check-out date must be after the check-in date.' }}
+            </span>
+          }
+        </label>
+
+        <label class="full-span">
+          Guest Count
+          <input type="number" formControlName="guestCount" min="1" max="12" />
+          @if (confirmationForm.controls.guestCount.touched && confirmationForm.controls.guestCount.invalid) {
+            <span class="error-text">Guest count must be between 1 and 12.</span>
+          }
+        </label>
+      </form>
+
+      <div class="summary-layout">
+        <article class="summary-card">
+          <h4>Business Logic</h4>
+          <p><strong>Maximum guests per room:</strong> 2</p>
+          <p><strong>Rooms required:</strong> {{ roomsNeeded() }}</p>
+          <p><strong>Dynamic pricing:</strong> Rs {{ selectedRoomCategory()?.price }} x {{ roomsNeeded() }} room(s) x {{ stayNights() }} night(s)</p>
+        </article>
+
+        <article class="summary-card">
+          <h4>Stay Summary</h4>
+          <p><strong>Subtotal:</strong> Rs {{ confirmationSubtotal() }}</p>
+          <p><strong>CGST (9%):</strong> Rs {{ cgstAmount() }}</p>
+          <p><strong>SGST (9%):</strong> Rs {{ sgstAmount() }}</p>
+          <p><strong>Total Amount:</strong> Rs {{ bookingGrandTotal() }}</p>
+        </article>
+      </div>
+
+      <div class="form-actions">
+        <button class="button-primary" type="button" (click)="continueToPayment()">Continue to Payment</button>
+      </div>
+    </section>
+  }
+
+  @if (homeStep() === 'payment' && selectedHotelCard(); as hotelCard) {
+    <section class="payment-page">
+      <div class="payment-page-head">
+        <p class="payment-kicker">CUSTOMER PAYMENT</p>
+        <h3>Complete Card Payment</h3>
+        <p class="payment-subtitle">Use the demo card form below to finish the booking flow for your selected room.</p>
+      </div>
+
+      <div class="payment-layout payment-layout-reference">
+        <section class="payment-reference-card payment-summary-card">
+          <p class="payment-section-label">BOOKING DETAILS</p>
+          <h4>{{ hotelCard.hotelName }}</h4>
+
+          <div class="payment-detail-list">
+            <div class="payment-detail-row">
+              <span>Guest</span>
+              <strong>{{ currentUser()?.name }}</strong>
+            </div>
+            <div class="payment-detail-row">
+              <span>Hotel</span>
+              <strong>{{ hotelCard.hotelName }}</strong>
+            </div>
+            <div class="payment-detail-row">
+              <span>Stay</span>
+              <strong>{{ hotelCard.cityName }} | {{ selectedRoomCategory()?.roomType }}</strong>
+            </div>
+            <div class="payment-detail-row">
+              <span>Dates</span>
+              <strong>{{ confirmationForm.controls.checkIn.value }} - {{ confirmationForm.controls.checkOut.value }}</strong>
+            </div>
+            <div class="payment-detail-row">
+              <span>Email</span>
+              <strong>{{ currentUser()?.email }}</strong>
+            </div>
+            <div class="payment-detail-row payment-multi-row">
+              <div>
+                <span>Guests</span>
+                <strong>{{ confirmationForm.controls.guestCount.value }}</strong>
+              </div>
+              <div>
+                <span>Rooms</span>
+                <strong>{{ roomsNeeded() }}</strong>
+              </div>
+            </div>
+            <div class="payment-detail-row">
+              <span>Room rate</span>
+              <strong>Rs {{ selectedRoomCategory()?.price }} / room / night</strong>
+            </div>
+            <div class="payment-detail-row">
+              <span>Subtotal</span>
+              <strong>Rs {{ confirmationSubtotal() }}</strong>
+            </div>
+            @if (couponDiscount() > 0) {
+              <div class="payment-detail-row">
+                <span>Coupon discount</span>
+                <strong>- Rs {{ couponDiscount() }}</strong>
+              </div>
+            }
+            <div class="payment-detail-row">
+              <span>Taxes & fees</span>
+              <strong>Rs {{ cgstAmount() + sgstAmount() }}</strong>
+            </div>
+          </div>
+
+          <div class="payment-total">
+            <span>Total payable</span>
+            <strong>Rs {{ bookingGrandTotal() }}</strong>
+          </div>
+
+          <div class="payment-note-box">
+            Card payment only. This is a UI demo and does not process real money.
+          </div>
+        </section>
+
+        <section class="payment-reference-card payment-form-shell">
+          <form [formGroup]="bookingForm" class="payment-method-form">
+            <p class="payment-section-label">CARD PAYMENT</p>
+            <h4>Pay with card</h4>
+
+            <label>
+              Payment method
+              <input type="text" formControlName="paymentMethod" readonly />
+            </label>
+
+            <label>
+              Coupon Code
+              <input type="text" formControlName="couponCode" placeholder="SAVE10, HM500, LUXE15" />
+            </label>
+
+            <label>
+              Special Requests
+              <textarea rows="2" formControlName="specialRequests" placeholder="Airport transfer, early check-in, extra pillows"></textarea>
+            </label>
+          </form>
+
+          <form [formGroup]="paymentForm" class="payment-card-form" (ngSubmit)="requestPaymentConfirmation()">
+            <div class="payment-form-grid">
+              <label class="full-span">
+                Name on card
+                <input type="text" formControlName="cardholderName" placeholder="Enter cardholder name" />
+              </label>
+              <label class="full-span">
+                Card number
+                <input type="text" formControlName="cardNumber" placeholder="1234123412341234" (input)="normalizeDigits('cardNumber', 16)" />
+              </label>
+              <label>
+                Expiry (MM/YY)
+                <input type="text" formControlName="expiryDate" placeholder="08/29" (input)="normalizeExpiry()" />
+              </label>
+              <label>
+                CVV
+                <input type="password" formControlName="cvv" placeholder="123" (input)="normalizeDigits('cvv', 3)" />
+              </label>
+              <label class="full-span">
+                Billing Address
+                <textarea rows="2" formControlName="billingAddress" placeholder="Enter billing address"></textarea>
+              </label>
+            </div>
+
+            @if (processingPayment()) {
+              <div class="payment-loader">
+                <span class="loader-ring"></span>
+                <p>Processing payment and confirming rooms...</p>
+              </div>
+            }
+
+            <div class="payment-action-row">
+              <button class="button-primary payment-pay-button" type="submit" [disabled]="processingPayment()">
+                Pay Rs {{ bookingGrandTotal() }}
+              </button>
+              <button class="button-secondary payment-edit-button" type="button" (click)="backToConfirmation()">Modify Booking</button>
+              <button class="button-secondary payment-back-button" type="button" (click)="backToHotelCards()">Back to Hotel</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </section>
+  }
+
+  @if (homeStep() === 'success' && successData(); as success) {
+    <section class="panel success-panel">
+      <div class="step-header">
+        <div>
+          <p class="room-city">{{ success.cityName }}</p>
+          <h3>Booking Success</h3>
+          <p class="muted">Your booking has been confirmed successfully.</p>
+        </div>
+      </div>
+
+      <div class="success-layout">
+        <article class="summary-card">
+          <h4>Booking Information</h4>
+          <p><strong>Booking ID(s):</strong> {{ success.bookingIds.join(', ') }}</p>
+          <p><strong>Invoice:</strong> {{ success.invoiceNumber }}</p>
+          <p><strong>Hotel:</strong> {{ success.hotelName }}</p>
+          <p><strong>Room Type:</strong> {{ success.roomType }}</p>
+          <p><strong>Check-in:</strong> {{ success.checkIn }}</p>
+          <p><strong>Check-out:</strong> {{ success.checkOut }}</p>
+        </article>
+
+        <article class="summary-card">
+          <h4>Invoice Summary</h4>
+          <p><strong>Subtotal:</strong> Rs {{ success.subtotal }}</p>
+          <p><strong>Discount:</strong> Rs {{ success.discount }}</p>
+          <p><strong>CGST:</strong> Rs {{ success.cgst }}</p>
+          <p><strong>SGST:</strong> Rs {{ success.sgst }}</p>
+          <p><strong>Total Paid:</strong> Rs {{ success.total }}</p>
+        </article>
+
+      </div>
+
+      <div class="form-actions">
+        <button class="button-primary" type="button" (click)="goToBookingsSection()">Go to My Bookings</button>
+        <button class="button-secondary" type="button" (click)="requestDownloadReceiptConfirmation()">Download Receipt</button>
+        <button class="button-secondary" type="button" (click)="goBackHome()">Back to Home</button>
+      </div>
+    </section>
+  }
+
+  @if (showAdditionalRoomsPopup()) {
+    <div class="overlay-backdrop">
+      <div class="overlay-card panel">
+        <div class="overlay-head">
+          <div>
+            <p class="overlay-label">BOOKING NOTICE</p>
+            <h3>Additional room required</h3>
+          </div>
+          <button type="button" class="overlay-close" (click)="closeAdditionalRoomsPopup()">X</button>
+        </div>
+
+        <p class="muted overlay-copy">
+          Each room can host up to 2 guests. Additional rooms have been added automatically based on your guest count.
+        </p>
+
+        <div class="overlay-metrics">
+          <div class="overlay-row">
+            <span>Total guests</span>
+            <strong>{{ confirmationForm.controls.guestCount.value }}</strong>
+          </div>
+          <div class="overlay-row">
+            <span>Rooms needed</span>
+            <strong>{{ roomsNeeded() }}</strong>
+          </div>
+          <div class="overlay-row">
+            <span>Capacity</span>
+            <strong>Maximum 2 members per room</strong>
+          </div>
+        </div>
+
+        <div class="overlay-actions">
+          <button class="button-primary overlay-confirm" type="button" (click)="acceptAdditionalRooms()">OK</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (bookingMessage) {
+    <p class="status-note">{{ bookingMessage }}</p>
+  }
+}
+
+@if (activeSection === 'bookings') {
+  <section class="panel">
+    <h3>Booking History</h3>
+    <div class="booking-columns">
+      <div>
+        <h4>Upcoming Bookings</h4>
+        @if (upcomingBookings.length) {
+          @for (booking of upcomingBookings; track booking.bookingId) {
+            <article class="list-card">
+              <p><strong>{{ booking.bookingId }}</strong> | {{ booking.hotelName }}, {{ booking.cityName }}</p>
+              <p>Booked On: {{ booking.bookedOn }} | {{ booking.roomType }} | {{ booking.checkIn }} to {{ booking.checkOut }}</p>
+              <p>Status: {{ booking.status }} | Payment: {{ booking.paymentStatus }} | Amount: Rs {{ booking.amount }}</p>
+              <div class="inline-actions">
+                <button class="button-secondary" type="button" (click)="startModify(booking)">Modify Booking</button>
+                <button class="button-secondary" type="button" (click)="requestCancelBookingConfirmation(booking)">Cancel Booking</button>
+              </div>
+            </article>
+          }
+        } @else {
+          <p class="muted">No bookings found. Start your journey by booking a room!</p>
+        }
+      </div>
+
+      <div>
+        <h4>Past Bookings</h4>
+        @if (pastBookings.length) {
+          @for (booking of pastBookings; track booking.bookingId) {
+            <article class="list-card">
+              <p><strong>{{ booking.bookingId }}</strong> | {{ booking.hotelName }}, {{ booking.cityName }}</p>
+              <p>Booked On: {{ booking.bookedOn }} | {{ booking.roomType }} | {{ booking.checkIn }} to {{ booking.checkOut }}</p>
+              <p>Status: {{ booking.status }} | Payment: {{ booking.paymentStatus }} | Amount: Rs {{ booking.amount }}</p>
+            </article>
+          }
+        } @else {
+          <p class="muted">No past bookings yet.</p>
+        }
+      </div>
+    </div>
+
+    @if (editingBookingId) {
+      <div class="edit-box">
+        <h4>Modify Booking</h4>
+        <form [formGroup]="modifyForm" (ngSubmit)="requestSaveModificationConfirmation()" class="form-grid">
+          <label>
+            Check-in Date
+            <input type="date" formControlName="checkIn" />
+          </label>
+          <label>
+            Check-out Date
+            <input type="date" formControlName="checkOut" />
+            @if (modifyForm.controls.checkOut.touched && modifyForm.controls.checkOut.invalid) {
+              <span class="error-text">
+                {{ modifyForm.controls.checkOut.errors?.['maxStayDuration'] ? 'Stay duration cannot exceed 14 days.' : 'Check-out date must be after the check-in date.' }}
+              </span>
+            }
+          </label>
+          <label>
+            Adults
+            <input type="number" formControlName="adults" min="1" max="10" />
+          </label>
+          <label>
+            Children
+            <input type="number" formControlName="children" min="0" max="5" />
+          </label>
+          <label class="full-span">
+            Room Type
+            <select formControlName="roomType">
+              @for (roomType of hotel.roomTypes; track roomType) {
+                <option [value]="roomType">{{ roomType }}</option>
+              }
+            </select>
+          </label>
+          <div class="form-actions full-span">
+            <button class="button-primary" type="submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    @if (bookingMessage) {
+      <p class="status-note">{{ bookingMessage }}</p>
+    }
+  </section>
+}
+
+@if (activeSection === 'complaints') {
+  <section class="complaint-grid">
+    <div class="panel">
+      <h3>Register Complaint</h3>
+      <form [formGroup]="complaintForm" (ngSubmit)="requestComplaintConfirmation()" class="form-grid">
+        @if (!eligibleComplaintBookings.length) {
+          <p class="status-note full-span">Complaints can be raised from check-in date until 7 days after checkout.</p>
+        }
+
+        <label>
+          Booking ID
+          <select formControlName="bookingId">
+            <option value="">Select booking</option>
+            @for (booking of eligibleComplaintBookings; track booking.bookingId) {
+              <option [value]="booking.bookingId">{{ booking.bookingId }} - {{ booking.hotelName }} ({{ booking.checkIn }} to {{ booking.checkOut }})</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Complaint Category
+          <select formControlName="category">
+            <option value="">Select category</option>
+            <option value="Room Issue">Room Issue</option>
+            <option value="Service Issue">Service Issue</option>
+            <option value="Billing Issue">Billing Issue</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+
+        <label class="full-span">
+          Complaint Title
+          <input type="text" formControlName="title" />
+          @if (complaintForm.controls.title.touched && complaintForm.controls.title.invalid) {
+            <span class="error-text">Please provide more details to help us resolve your issue.</span>
+          }
+        </label>
+
+        <label class="full-span">
+          Complaint Description
+          <textarea rows="4" formControlName="description"></textarea>
+          @if (complaintForm.controls.description.touched && complaintForm.controls.description.invalid) {
+            <span class="error-text">Please provide more details to help us resolve your issue.</span>
+          }
+        </label>
+
+        <label class="full-span">
+          Contact Preference
+          <select formControlName="contactPreference">
+            <option value="Email">Email</option>
+            <option value="Call">Call</option>
+          </select>
+        </label>
+
+        <div class="form-actions full-span">
+          <button class="button-primary" type="submit" [disabled]="complaintForm.invalid || !eligibleComplaintBookings.length">Submit Complaint</button>
+        </div>
+      </form>
+
+      @if (complaintMessage) {
+        <p class="status-note">{{ complaintMessage }}</p>
+      }
+    </div>
+
+    <div class="panel">
+      <h3>View Complaints</h3>
+      @if (allComplaints().length) {
+        @for (complaint of allComplaints(); track complaint.complaintId) {
+          <article class="list-card clickable" (click)="openComplaint(complaint)">
+            <p><strong>{{ complaint.complaintId }}</strong> | {{ complaint.category }}</p>
+            <p>{{ complaint.title }}</p>
+            <p>Status: {{ complaint.status }} | Expected resolution: {{ complaint.expectedResolution }}</p>
+          </article>
+        }
+      } @else {
+        <p class="muted">You have not registered any complaints.</p>
+      }
+
+      @if (selectedComplaint) {
+        <div class="detail-box">
+          <h4>{{ selectedComplaint.title }}</h4>
+          <p>{{ selectedComplaint.description }}</p>
+          <p><strong>Status:</strong> {{ selectedComplaint.status }}</p>
+          <p><strong>Response:</strong> {{ selectedComplaint.response || 'No response yet.' }}</p>
+          <p><strong>Resolution Notes:</strong> {{ selectedComplaint.resolutionNotes || 'Pending.' }}</p>
+          @if (selectedComplaint.status === 'Resolved') {
+            <div class="inline-actions">
+              <button class="button-primary" type="button" (click)="updateComplaintStatus('Closed')">Confirm Resolution</button>
+              <button class="button-secondary" type="button" (click)="updateComplaintStatus('Open')">Reopen Complaint</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}
+
+@if (activeSection === 'contact') {
+  <section class="contact-grid">
+    <article class="panel contact-card">
+      <h3>Contact Support</h3>
+      <p class="muted">Reach the hotel support team for booking help, room issues, payment questions, or general assistance.</p>
+      <div class="contact-details">
+        <p><strong>Email:</strong> support&#64;hmhotels.com</p>
+        <p><strong>Phone:</strong> +91 1800 123 4567</p>
+        <p><strong>Hours:</strong> 24x7 customer assistance</p>
+      </div>
+    </article>
+
+    <article class="panel contact-card">
+      <h3>Need Faster Resolution?</h3>
+      <p class="muted">For stay-related issues, use the complaint section with your booking ID so the support team can track and resolve it faster.</p>
+      <div class="inline-actions">
+        <button class="button-primary" type="button" (click)="setSection('complaints')">Open Complaint Form</button>
+        <button class="button-secondary" type="button" (click)="setSection('bookings')">View My Bookings</button>
+      </div>
+    </article>
+  </section>
+}
+
+@if (activeSection === 'profile') {
+  <section class="panel">
+    <h3>My Profile</h3>
+    <form [formGroup]="profileForm" (ngSubmit)="requestProfileSaveConfirmation()" class="form-grid">
+      <label>
+        User ID
+        <input type="text" formControlName="userId" />
+      </label>
+
+      <label>
+        Full Name
+        <input type="text" formControlName="name" />
+        @if (profileForm.controls.name.touched && profileForm.controls.name.invalid) {
+          <span class="error-text">Full Name is mandatory and should not contain numbers or special characters.</span>
+        }
+      </label>
+
+      <label>
+        Email
+        <input type="email" formControlName="email" />
+        @if (profileForm.controls.email.touched && profileForm.controls.email.invalid) {
+          <span class="error-text">Please enter a valid email address.</span>
+        }
+      </label>
+
+      <div class="split-field">
+        <label>
+          Country Code
+          <select formControlName="countryCode">
+            @for (code of hotel.countryCodes; track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Phone Number
+          <input type="text" formControlName="mobile" />
+          @if (profileForm.controls.mobile.touched && profileForm.controls.mobile.invalid) {
+            <span class="error-text">Please enter a valid Indian phone number starting with 6 to 9.</span>
+          }
+        </label>
+      </div>
+
+      <label class="full-span">
+        Address
+        <textarea rows="3" formControlName="address"></textarea>
+      </label>
+
+      <div class="form-actions full-span">
+        <button class="button-primary" type="submit">Save Changes</button>
+      </div>
+    </form>
+
+    @if (profileMessage) {
+      <p class="status-note">{{ profileMessage }}</p>
+    }
+  </section>
+}
+
+@if (confirmationDialog(); as dialog) {
+  <div class="overlay-backdrop">
+    <div class="overlay-card panel">
+      <div class="overlay-head">
+        <div>
+          <p class="overlay-label">{{ dialog.label }}</p>
+          <h3>{{ dialog.title }}</h3>
+        </div>
+        <button type="button" class="overlay-close" (click)="closeConfirmationDialog()">X</button>
+      </div>
+
+      <p class="muted overlay-copy">{{ dialog.message }}</p>
+
+      <div class="overlay-actions">
+        <button class="button-secondary" type="button" (click)="closeConfirmationDialog()">No, Go Back</button>
+        <button class="button-primary overlay-confirm" type="button" (click)="confirmDialogAction()">{{ dialog.confirmText }}</button>
+      </div>
+    </div>
+  </div>
+}
+</section>

@@ -1,0 +1,725 @@
+[1m[33mComponent HMR has been enabled, see https://angular.dev/hmr for more info.[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Incomplete block "hmhotels". If you meant to write the @ character, you should use the "&#64;" HTML entity instead.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:453:42:
+[37m      453 │         <p><strong>Email:</strong> support[32m@hmhotels[37m.com</p>
+          ╵                                           [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:21:15:
+[37m      21 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Incomplete block "hmhotels". If you meant to write the @ character, you should use the "&#64;" HTML entity instead.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:453:42:
+[37m      453 │         <p><strong>Email:</strong> support[32m@hmhotels[37m.com</p>
+          ╵                                           [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:21:15:
+[37m      21 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'id' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:51:55:
+[37m      51 │         @for (room of paginatedHomeRooms(); track room.[32mid[37m) {
+         ╵                                                        [32m~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'roomType' does not exist on type 'HotelCard'. Did you mean 'roomTypes'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:57:41:
+[37m      57 │ ...   <p class="muted">{{ room.[32mroomType[37m }} | Room {{ room.roomNumb...
+         ╵                                [32m~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'roomNumber' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:57:68:
+[37m      57 │ ....roomType }} | Room {{ room.[32mroomNumber[37m }} | {{ room.bedType }}</p>
+         ╵                                [32m~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'bedType' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:57:92:
+[37m      57 │ ....roomType }} | Room {{ room.roomNumber }} | {{ room.[32mbedType[37m }}</p>
+         ╵                                                        [32m~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'price' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:60:35:
+[37m      60 │                 <strong>Rs {{ room.[32mprice[37m }}</strong>
+         ╵                                    [32m~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'available' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:68:28:
+[37m      68 │               <span>{{ room.[32mavailable[37m ? 'Available' : 'Fully booke...
+         ╵                             [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'maxAdults' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:69:28:
+[37m      69 │               <span>{{ room.[32mmaxAdults[37m }} adults</span>
+         ╵                             [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'maxChildren' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:70:28:
+[37m      70 │               <span>{{ room.[32mmaxChildren[37m }} children</span>
+         ╵                             [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'size' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:71:28:
+[37m      71 │               <span>{{ room.[32msize[37m }} sq ft</span>
+         ╵                             [32m~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'available' does not exist on type 'HotelCard'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:77:77:
+[37m      77 │ ..."button" [disabled]="!room.[32mavailable[37m" (click)="startBooking(roo...
+         ╵                               [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5: Argument of type 'HotelCard' is not assignable to parameter of type 'Room'.
+  Type 'HotelCard' is missing the following properties from type 'Room': id, roomNumber, roomType, bedType, and 6 more.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:77:110:
+[37m      77 │ ...]="!room.available" (click)="startBooking([32mroom[37m)">Book Now</button>
+         ╵                                              [32m~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2531: Object is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:4:
+[37m      408 │     [32mthis.selectedRoom[37m.set(category.rooms.find((room) => room.avai...
+          ╵     [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'set' does not exist on type 'Room'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:22:
+[37m      408 │     this.selectedRoom.[32mset[37m(category.rooms.find((room) => room.avai...
+          ╵                       [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:505:18:
+[37m      505 │         cityCode: [32mhotel[37m.cityCode,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:506:19:
+[37m      506 │         hotelCode: [32mhotel[37m.hotelCode,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:511:18:
+[37m      511 │         roomType: [32mcategory[37m.roomType
+          ╵                   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:549:63:
+[37m      549 │ ...r}|${bookingIds.join(',')}|${[32mhotel[37m.hotelName}|${confirmation.c...
+          ╵                                 [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:557:19:
+[37m      557 │         hotelName: [32mhotel[37m.hotelName,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:558:18:
+[37m      558 │         cityName: [32mhotel[37m.cityName,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:559:18:
+[37m      559 │         roomType: [32mcategory[37m.roomType,
+          ╵                   [32m~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2531: Object is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:4:
+[37m      408 │     [32mthis.selectedRoom[37m.set(category.rooms.find((room) => room.avai...
+          ╵     [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'set' does not exist on type 'Room'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:22:
+[37m      408 │     this.selectedRoom.[32mset[37m(category.rooms.find((room) => room.avai...
+          ╵                       [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:505:18:
+[37m      505 │         cityCode: [32mhotel[37m.cityCode,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:506:19:
+[37m      506 │         hotelCode: [32mhotel[37m.hotelCode,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:511:18:
+[37m      511 │         roomType: [32mcategory[37m.roomType
+          ╵                   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:549:63:
+[37m      549 │ ...r}|${bookingIds.join(',')}|${[32mhotel[37m.hotelName}|${confirmation.c...
+          ╵                                 [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:557:19:
+[37m      557 │         hotelName: [32mhotel[37m.hotelName,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:558:18:
+[37m      558 │         cityName: [32mhotel[37m.cityName,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:559:18:
+[37m      559 │         roomType: [32mcategory[37m.roomType,
+          ╵                   [32m~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2531: Object is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:4:
+[37m      408 │     [32mthis.selectedRoom[37m.set(category.rooms.find((room) => room.avai...
+          ╵     [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'set' does not exist on type 'Room'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:408:22:
+[37m      408 │     this.selectedRoom.[32mset[37m(category.rooms.find((room) => room.avai...
+          ╵                       [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:505:18:
+[37m      505 │         cityCode: [32mhotel[37m.cityCode,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:506:19:
+[37m      506 │         hotelCode: [32mhotel[37m.hotelCode,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:511:18:
+[37m      511 │         roomType: [32mcategory[37m.roomType
+          ╵                   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:549:63:
+[37m      549 │ ...r}|${bookingIds.join(',')}|${[32mhotel[37m.hotelName}|${confirmation.c...
+          ╵                                 [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:557:19:
+[37m      557 │         hotelName: [32mhotel[37m.hotelName,
+          ╵                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'hotel' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:558:18:
+[37m      558 │         cityName: [32mhotel[37m.cityName,
+          ╵                   [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS18047: 'category' is possibly 'null'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:559:18:
+[37m      559 │         roomType: [32mcategory[37m.roomType,
+          ╵                   [32m~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'syncCalculatedAmount' is private and only accessible within class 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:151:65:
+[37m      151 │ ...e" formControlName="checkIn" (change)="[32msyncCalculatedAmount[37m()" />
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'syncCalculatedAmount' is private and only accessible within class 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:159:66:
+[37m      159 │ ..." formControlName="checkOut" (change)="[32msyncCalculatedAmount[37m()" />
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:64:15:
+[37m      64 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'paymentQrUrl' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:370:22:
+[37m      370 │           <img [src]="[32mpaymentQrUrl[37m()" alt="Booking QR code" />
+          ╵                       [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2353: Object literal may only specify known properties, and 'qrPayload' does not exist in type 'BookingSuccessData'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:570:8:
+[37m      570 │         [32mqrPayload[37m: `${invoiceNumber}|${bookingIds.join(',')}|${ho...
+          ╵         [32m~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'requestContinueToPaymentConfirmation' does not exist on type 'CustomerPortalComponent'. Did you mean 'requestPaymentConfirmation'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:194:62:
+[37m      194 │ ...on" (click)="[32mrequestContinueToPaymentConfirmation[37m()">Continue ...
+          ╵                 [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'paymentQrUrl' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:370:22:
+[37m      370 │           <img [src]="[32mpaymentQrUrl[37m()" alt="Booking QR code" />
+          ╵                       [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2353: Object literal may only specify known properties, and 'qrPayload' does not exist in type 'BookingSuccessData'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.ts:561:8:
+[37m      561 │         [32mqrPayload[37m: `${invoiceNumber}|${bookingIds.join(',')}|${ho...
+          ╵         [32m~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'requestContinueToPaymentConfirmation' does not exist on type 'CustomerPortalComponent'. Did you mean 'requestPaymentConfirmation'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:194:62:
+[37m      194 │ ...on" (click)="[32mrequestContinueToPaymentConfirmation[37m()">Continue ...
+          ╵                 [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'paymentQrUrl' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:370:22:
+[37m      370 │           <img [src]="[32mpaymentQrUrl[37m()" alt="Booking QR code" />
+          ╵                       [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'requestContinueToPaymentConfirmation' does not exist on type 'CustomerPortalComponent'. Did you mean 'requestPaymentConfirmation'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:194:62:
+[37m      194 │ ...on" (click)="[32mrequestContinueToPaymentConfirmation[37m()">Continue ...
+          ╵                 [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'paymentQrUrl' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:370:22:
+[37m      370 │           <img [src]="[32mpaymentQrUrl[37m()" alt="Booking QR code" />
+          ╵                       [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckIn' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:19:38:
+[37m      19 │ ... type="date" [ngModel]="[32mselectedCheckIn[37m()" (ngModelChange)="upd...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'updateSelectedCheckIn' does not exist on type 'LandingComponent'. Did you mean 'updateSelectedCity'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:19:74:
+[37m      19 │ ...ectedCheckIn()" (ngModelChange)="[32mupdateSelectedCheckIn[37m($event)" />
+         ╵                                     [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckOut' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:23:38:
+[37m      23 │ ... type="date" [ngModel]="[32mselectedCheckOut[37m()" (ngModelChange)="up...
+         ╵                            [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1: Property 'updateSelectedCheckOut' does not exist on type 'LandingComponent'. Did you mean 'updateSelectedCity'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:23:75:
+[37m      23 │ ...()" (ngModelChange)="[32mupdateSelectedCheckOut[37m($event)" [min]="sel...
+         ╵                         [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckIn' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:23:114:
+[37m      23 │ ...dateSelectedCheckOut($event)" [min]="[32mselectedCheckIn[37m() || null" />
+         ╵                                         [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckIn' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:66:15:
+[37m      66 │           @if ([32mselectedCheckIn[37m() && selectedCheckOut()) {
+         ╵                [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckOut' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:66:36:
+[37m      66 │           @if (selectedCheckIn() && [32mselectedCheckOut[37m()) {
+         ╵                                     [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckIn' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:67:55:
+[37m      67 │ ...ailability shown for {{ [32mselectedCheckIn[37m() }} to {{ selectedChec...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'selectedCheckOut' does not exist on type 'LandingComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/landing/landing.component.html:67:82:
+[37m      67 │ ...shown for {{ selectedCheckIn() }} to {{ [32mselectedCheckOut[37m() }}.</p>
+         ╵                                            [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LandingComponent.
+
+    src/app/pages/landing/landing.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./landing.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckInDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:38:42:
+[37m      38 │ ... type="date" [ngModel]="[32mhomeCheckInDate[37m()" (ngModelChange)="upd...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'updateHomeCheckInDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:38:78:
+[37m      38 │ ...()" (ngModelChange)="[32mupdateHomeCheckInDate[37m($event)" [ngModelOpt...
+         ╵                         [32m~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckOutDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:42:42:
+[37m      42 │ ... type="date" [ngModel]="[32mhomeCheckOutDate[37m()" (ngModelChange)="up...
+         ╵                            [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'updateHomeCheckOutDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:42:79:
+[37m      42 │ ...()" (ngModelChange)="[32mupdateHomeCheckOutDate[37m($event)" [min]="hom...
+         ╵                         [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckInDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:42:118:
+[37m      42 │ ...OutDate($event)" [min]="[32mhomeCheckInDate[37m() || null" [ngModelOpti...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckInDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:69:23:
+[37m      69 │                   @if ([32mhomeCheckInDate[37m() && homeCheckOutDate()) {
+         ╵                        [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckOutDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:69:44:
+[37m      69 │                   @if (homeCheckInDate() && [32mhomeCheckOutDate[37m()) {
+         ╵                                             [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckInDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:70:57:
+[37m      70 │ ...ed">Availability for {{ [32mhomeCheckInDate[37m() }} to {{ homeCheckOut...
+         ╵                            [32m~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG9: Property 'homeCheckOutDate' does not exist on type 'CustomerPortalComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/pages/customer-portal/customer-portal.component.html:70:84:
+[37m      70 │ ...bility for {{ homeCheckInDate() }} to {{ [32mhomeCheckOutDate[37m() }}</p>
+         ╵                                             [32m~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component CustomerPortalComponent.
+
+    src/app/pages/customer-portal/customer-portal.component.ts:71:15:
+[37m      71 │   templateUrl: [32m'./customer-portal.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

@@ -1,0 +1,9 @@
+.portal-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+}

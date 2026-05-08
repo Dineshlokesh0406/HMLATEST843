@@ -1,0 +1,23 @@
+.auth-panel {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.auth-side {
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+  padding-left: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .auth-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-side {
+    border-left: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}

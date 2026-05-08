@@ -1,0 +1,96 @@
+<section class="panel form-layout">
+  <div>
+    <h2>Customer Registration</h2>
+    <p class="muted">Validations follow the Excel backlog: required fields, uniqueness checks, password rules, and disabled submit until valid.</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()" class="form-grid">
+      <label>
+        Customer Name
+        <input type="text" formControlName="name" placeholder="Enter full name" />
+        @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+          <span class="error-text">Name must be at least 3 characters long and contain only letters.</span>
+        }
+      </label>
+
+      <label>
+        Email
+        <input type="email" formControlName="email" placeholder="example@domain.com" />
+        @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+          <span class="error-text">Enter a valid email address.</span>
+        }
+      </label>
+
+      <div class="split-field">
+        <label>
+          Country Code
+          <select formControlName="countryCode">
+            <option value="+91">+91</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <option value="+61">+61</option>
+          </select>
+        </label>
+
+        <label>
+          Mobile Number
+          <input type="text" formControlName="mobile" placeholder="Starts 6-9, 8 to 10 digits" />
+          @if (registerForm.controls.mobile.touched && registerForm.controls.mobile.invalid) {
+            <span class="error-text">Enter a valid Indian mobile number starting with 6 to 9.</span>
+          }
+        </label>
+      </div>
+
+      <label class="full-span">
+        Address
+        <textarea rows="3" formControlName="address" placeholder="Enter address"></textarea>
+        @if (registerForm.controls.address.touched && registerForm.controls.address.invalid) {
+          <span class="error-text">Address must be at least 10 characters long.</span>
+        }
+      </label>
+
+      <label>
+        Username
+        <input type="text" formControlName="username" placeholder="No spaces, minimum 5 characters" />
+        @if (registerForm.controls.username.touched && registerForm.controls.username.invalid) {
+          <span class="error-text">Username must be at least 5 characters and unique.</span>
+        }
+      </label>
+
+      <label>
+        Password
+        <input type="password" formControlName="password" placeholder="Strong password" />
+        @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+          <span class="error-text">Password must be at least 8 characters and include a mix of uppercase, lowercase, number, and special character.</span>
+        }
+      </label>
+
+      <label class="full-span">
+        Confirm Password
+        <input type="password" formControlName="confirmPassword" placeholder="Re-enter password" />
+        @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid) {
+          <span class="error-text">Passwords do not match.</span>
+        }
+      </label>
+
+      <div class="form-actions full-span">
+        <button type="submit" class="button-primary" [disabled]="registerForm.invalid">Register</button>
+        <button type="button" class="button-secondary" (click)="resetForm()">Reset</button>
+        <a class="text-link" routerLink="/login">Already have an account? Login now</a>
+      </div>
+    </form>
+
+    @if (formMessage) {
+      <p class="status-note">{{ formMessage }}</p>
+    }
+  </div>
+
+  @if (acknowledgementUser) {
+    <aside class="acknowledgement">
+      <h3>Registration Successful!</h3>
+      <p><strong>User ID:</strong> {{ acknowledgementUser.userId }}</p>
+      <p><strong>Customer Name:</strong> {{ acknowledgementUser.name }}</p>
+      <p><strong>Email:</strong> {{ acknowledgementUser.email }}</p>
+      <button class="button-primary" type="button" (click)="goToLogin()">Login Now</button>
+    </aside>
+  }
+</section>

@@ -1,0 +1,68 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.hm:hotel-management-backend >-------------------
+[INFO] Building hotel-management-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.5:run (default-cli) > test-compile @ hotel-management-backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-management-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-management-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ hotel-management-backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Lenovo\Desktop\HM\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ hotel-management-backend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.3.5:run (default-cli) < test-compile @ hotel-management-backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.5:run (default-cli) @ hotel-management-backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-05-06T23:29:33.980+05:30  INFO 13184 --- [hotel-management-backend] [           main] c.h.b.HotelManagementBackendApplication  : Starting HotelManagementBackendApplication using Java 21.0.10 with PID 13184 (C:\Users\Lenovo\Desktop\HM\backend\target\classes started by Lenovo in C:\Users\Lenovo\Desktop\HM\backend)
+2026-05-06T23:29:33.982+05:30  INFO 13184 --- [hotel-management-backend] [           main] c.h.b.HotelManagementBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-05-06T23:29:34.858+05:30  INFO 13184 --- [hotel-management-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-05-06T23:29:34.872+05:30  INFO 13184 --- [hotel-management-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-06T23:29:34.873+05:30  INFO 13184 --- [hotel-management-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-05-06T23:29:34.942+05:30  INFO 13184 --- [hotel-management-backend] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-06T23:29:34.943+05:30  INFO 13184 --- [hotel-management-backend] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 916 ms
+2026-05-06T23:29:35.389+05:30  INFO 13184 --- [hotel-management-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-05-06T23:29:35.396+05:30  INFO 13184 --- [hotel-management-backend] [           main] c.h.b.HotelManagementBackendApplication  : Started HotelManagementBackendApplication in 1.738 seconds (process running for 2.023)
+2026-05-06T23:30:09.138+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-06T23:30:09.139+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-06T23:30:09.140+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-05-06T23:30:09.172+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-06T23:30:09.319+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-2] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@262dfb59
+2026-05-06T23:30:09.321+05:30  INFO 13184 --- [hotel-management-backend] [nio-8081-exec-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-07T01:21:59.439+05:30  WARN 13184 --- [hotel-management-backend] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h22m19s629ms506µs400ns).
+2026-05-07T05:14:27.417+05:30  WARN 13184 --- [hotel-management-backend] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3h27s343ms206µs200ns).
+2026-05-07T20:35:07.004+05:30  WARN 13184 --- [hotel-management-backend] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15h20m43s141ms987µs).
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  23:27 h
+[INFO] Finished at: 2026-05-07T22:56:44+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.5:run (default-cli) on project hotel-management-backend: Process terminated with exit code: -1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

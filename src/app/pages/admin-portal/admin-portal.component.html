@@ -1,0 +1,435 @@
+<section class="panel portal-header">
+  <div>
+    <h2>Admin Portal</h2>
+    <p class="muted">This screen covers room, reservation, user, bill, and complaint management based on the workbook backlog.</p>
+  </div>
+  <button class="button-secondary" type="button" (click)="logout()">Logout</button>
+</section>
+
+<section class="panel tabs">
+  <button type="button" [class.active]="activeSection === 'dashboard'" (click)="setSection('dashboard')">Dashboard</button>
+  <button type="button" [class.active]="activeSection === 'rooms'" (click)="setSection('rooms')">Room Management</button>
+  <button type="button" [class.active]="activeSection === 'reservations'" (click)="setSection('reservations')">Booking Management</button>
+  <button type="button" [class.active]="activeSection === 'users'" (click)="setSection('users')">User Management</button>
+  <button type="button" [class.active]="activeSection === 'bills'" (click)="setSection('bills')">Bills</button>
+  <button type="button" [class.active]="activeSection === 'complaints'" (click)="setSection('complaints')">Complaints</button>
+</section>
+
+@if (activeSection === 'dashboard') {
+  <section class="dashboard-grid">
+    <article class="panel stat-card">
+      <span class="stat-label">Bookings</span>
+      <strong>{{ totalBookings }}</strong>
+    </article>
+    <article class="panel stat-card">
+      <span class="stat-label">Available Rooms</span>
+      <strong>{{ availableRoomsCount }}</strong>
+    </article>
+    <article class="panel stat-card">
+      <span class="stat-label">Open Complaints</span>
+      <strong>{{ openComplaintsCount }}</strong>
+    </article>
+  </section>
+}
+
+@if (activeSection === 'rooms') {
+  <section class="workspace-grid">
+    <div class="panel">
+      <h3>{{ selectedRoomId ? 'Edit Room' : 'Add Room' }}</h3>
+      <form [formGroup]="roomForm" (ngSubmit)="saveRoom()" class="form-grid">
+        <label>
+          City
+          <select formControlName="cityCode" (change)="onRoomCityChange()">
+            <option value="">Select city</option>
+            @for (city of cities; track city.cityCode) {
+              <option [value]="city.cityCode">{{ city.cityName }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Hotel
+          <select formControlName="hotelCode">
+            <option value="">Select hotel</option>
+            @for (hotelItem of roomHotels; track hotelItem.hotelCode) {
+              <option [value]="hotelItem.hotelCode">{{ hotelItem.hotelName }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Room Number
+          <input type="text" formControlName="roomNumber" placeholder="Auto-generated if blank" />
+        </label>
+        <label>
+          Room Type
+          <select formControlName="roomType">
+            @for (roomType of hotel.roomTypes; track roomType) {
+              <option [value]="roomType">{{ roomType }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Bed Type
+          <input type="text" formControlName="bedType" />
+        </label>
+        <label>
+          Price
+          <input type="number" formControlName="price" min="1" />
+        </label>
+        <label class="full-span">
+          Amenities
+          <input type="text" formControlName="amenities" placeholder="Comma separated" />
+        </label>
+        <label>
+          Max Occupancy Adults
+          <input type="number" formControlName="maxAdults" min="1" />
+        </label>
+        <label>
+          Max Occupancy Children
+          <input type="number" formControlName="maxChildren" min="0" />
+        </label>
+        <label>
+          Status
+          <select formControlName="status">
+            <option value="Available">Available</option>
+            <option value="Occupied">Occupied</option>
+            <option value="Under Maintenance">Under Maintenance</option>
+          </select>
+        </label>
+        <label>
+          Booking Availability
+          <select formControlName="available">
+            <option [ngValue]="true">Available</option>
+            <option [ngValue]="false">Not Available</option>
+          </select>
+        </label>
+        <label class="full-span">
+          Description
+          <textarea rows="3" formControlName="description"></textarea>
+        </label>
+        <div class="form-actions full-span">
+          <button class="button-primary" type="submit">Save Room</button>
+        </div>
+      </form>
+      @if (roomMessage) {
+        <p class="status-note">{{ roomMessage }}</p>
+      }
+    </div>
+
+    <div class="panel">
+      <h3>Room Listing</h3>
+      <input class="search-box" type="text" [(ngModel)]="roomSearch" [ngModelOptions]="{ standalone: true }" placeholder="Search by room number or type" />
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Hotel</th>
+              <th>Room No</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Occupancy</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (room of rooms; track room.id) {
+              <tr>
+                <td>{{ room.cityName }}</td>
+                <td>{{ room.hotelName }}</td>
+                <td>{{ room.roomNumber }}</td>
+                <td>{{ room.roomType }}</td>
+                <td>Rs {{ room.price }}</td>
+                <td>{{ room.status }}</td>
+                <td>{{ room.maxAdults }}/{{ room.maxChildren }}</td>
+                <td><button class="button-secondary" type="button" (click)="editRoom(room)">Edit</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+}
+
+@if (activeSection === 'reservations') {
+  <section class="workspace-grid">
+    <div class="panel">
+      <h3>Create Reservation</h3>
+      <form [formGroup]="reservationForm" (ngSubmit)="saveReservation()" class="form-grid">
+        <label>
+          Customer ID
+          <input type="text" formControlName="customerId" />
+        </label>
+        <label>
+          Full Name
+          <input type="text" formControlName="customerName" />
+        </label>
+        <label>
+          Email
+          <input type="email" formControlName="contactEmail" />
+        </label>
+        <label>
+          Phone
+          <input type="text" formControlName="contactPhone" />
+        </label>
+        <label>
+          City
+          <select formControlName="cityCode" (change)="onReservationCityChange()">
+            <option value="">Select city</option>
+            @for (city of cities; track city.cityCode) {
+              <option [value]="city.cityCode">{{ city.cityName }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Hotel
+          <select formControlName="hotelCode">
+            <option value="">Select hotel</option>
+            @for (hotelItem of reservationHotels; track hotelItem.hotelCode) {
+              <option [value]="hotelItem.hotelCode">{{ hotelItem.hotelName }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Check-in
+          <input type="date" formControlName="checkIn" />
+        </label>
+        <label>
+          Check-out
+          <input type="date" formControlName="checkOut" />
+        </label>
+        <label>
+          Guests
+          <input type="number" formControlName="guests" min="1" max="10" />
+        </label>
+        <label>
+          Room Type
+          <select formControlName="roomType">
+            @for (roomType of hotel.roomTypes; track roomType) {
+              <option [value]="roomType">{{ roomType }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Payment Method
+          <input type="text" formControlName="paymentMethod" />
+        </label>
+        <label>
+          Deposit Amount
+          <input type="number" formControlName="depositAmount" min="0" />
+        </label>
+        <label class="full-span">
+          Special Requests
+          <textarea rows="2" formControlName="specialRequests"></textarea>
+        </label>
+        <div class="form-actions full-span">
+          <button class="button-primary" type="submit">Reserve Room</button>
+        </div>
+      </form>
+      @if (reservationMessage) {
+        <p class="status-note">{{ reservationMessage }}</p>
+      }
+    </div>
+
+    <div class="panel">
+      <h3>All Reservations</h3>
+      <input class="search-box" type="text" [(ngModel)]="reservationSearch" [ngModelOptions]="{ standalone: true }" placeholder="Search by booking ID, guest, room number" />
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Reservation ID</th>
+              <th>Customer</th>
+              <th>Hotel</th>
+              <th>Room</th>
+              <th>Dates</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (reservation of reservations; track reservation.bookingId) {
+              <tr>
+                <td>{{ reservation.bookingId }}</td>
+                <td>{{ reservation.customerName }}</td>
+                <td>{{ reservation.hotelName }}, {{ reservation.cityName }}</td>
+                <td>{{ reservation.roomNumber }}</td>
+                <td>{{ reservation.checkIn }} - {{ reservation.checkOut }}</td>
+                <td>{{ reservation.status }}</td>
+                <td>Rs {{ reservation.amount }}</td>
+                <td><button class="button-secondary" type="button" (click)="cancelReservation(reservation.bookingId)">Cancel</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+}
+
+@if (activeSection === 'users') {
+  <section class="panel">
+    <h3>Customer Accounts</h3>
+    <input class="search-box" type="text" [(ngModel)]="userSearch" [ngModelOptions]="{ standalone: true }" placeholder="Search by username or email" />
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.userId) {
+            <tr>
+              <td>{{ user.userId }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.role }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.status }}</td>
+              <td>
+                <button class="button-secondary" type="button" (click)="toggleUserStatus(user.userId, user.status)">
+                  {{ user.status === 'Active' ? 'Deactivate' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+@if (activeSection === 'bills') {
+  <section class="workspace-grid">
+    <div class="panel">
+      <h3>Create Bill</h3>
+      <form [formGroup]="billForm" (ngSubmit)="saveBill()" class="form-grid">
+        <label>
+          Customer ID
+          <input type="text" formControlName="customerId" />
+        </label>
+        <label>
+          Customer Name
+          <input type="text" formControlName="customerName" />
+        </label>
+        <label>
+          Room Charges
+          <input type="number" formControlName="roomCharges" min="0" />
+        </label>
+        <label>
+          Service Charges
+          <input type="number" formControlName="serviceCharges" min="0" />
+        </label>
+        <label>
+          Tax
+          <input type="number" formControlName="tax" min="0" />
+        </label>
+        <label>
+          Discount
+          <input type="number" formControlName="discount" min="0" />
+        </label>
+        <label class="full-span">
+          Payment Status
+          <select formControlName="paymentStatus">
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Partially Paid">Partially Paid</option>
+          </select>
+        </label>
+        <div class="form-actions full-span">
+          <button class="button-primary" type="submit">Save Bill</button>
+        </div>
+      </form>
+      @if (billMessage) {
+        <p class="status-note">{{ billMessage }}</p>
+      }
+    </div>
+
+    <div class="panel">
+      <h3>Search Bills</h3>
+      <input class="search-box" type="text" [(ngModel)]="billSearch" [ngModelOptions]="{ standalone: true }" placeholder="Search by bill ID or customer" />
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Bill ID</th>
+              <th>Customer</th>
+              <th>Issued On</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bill of bills; track bill.billId) {
+              <tr>
+                <td>{{ bill.billId }}</td>
+                <td>{{ bill.customerName }}</td>
+                <td>{{ bill.issuedOn }}</td>
+                <td>Rs {{ bill.totalAmount }}</td>
+                <td>{{ bill.paymentStatus }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+}
+
+@if (activeSection === 'complaints') {
+  <section class="panel">
+    <h3>Complaint Dashboard</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Complaint ID</th>
+            <th>Customer</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Assign To</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (complaint of complaints; track complaint.complaintId) {
+            <tr>
+              <td>{{ complaint.complaintId }}</td>
+              <td>{{ complaint.userId }}</td>
+              <td>{{ complaint.category }}</td>
+              <td>{{ complaint.status }}</td>
+              <td>
+                <select
+                  [ngModel]="selectedComplaintAssignee[complaint.complaintId] || complaint.assignedTo || ''"
+                  (ngModelChange)="selectedComplaintAssignee[complaint.complaintId] = $event"
+                  [ngModelOptions]="{ standalone: true }"
+                >
+                  <option value="">Select staff</option>
+                  @for (staffUser of staffUsers; track staffUser.userId) {
+                    <option [value]="staffUser.userId">{{ staffUser.name }} ({{ staffUser.userId }})</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <select #statusSelect>
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Closed">Closed</option>
+                </select>
+                <button class="button-secondary" type="button" (click)="updateComplaint(complaint.complaintId, statusSelect.value)">Save</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
