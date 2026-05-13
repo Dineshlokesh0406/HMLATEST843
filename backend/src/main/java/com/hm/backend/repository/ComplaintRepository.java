@@ -32,7 +32,7 @@ public class ComplaintRepository {
                 insert into complaints
                 (complaint_code, customer_id, booking_id, category, complaint_title, complaint_description, contact_preference,
                  complaint_status, expected_resolution_date)
-                values (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?)
+                values (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)
                 """,
             complaintCode,
             customerId,
@@ -58,6 +58,8 @@ public class ComplaintRepository {
             """
                 update complaints
                 set complaint_status = ?, assigned_to = ?, response_text = ?, resolution_notes = ?,
+                    assigned_at = case when ? is not null and assigned_at is null then now() else assigned_at end,
+                    resolved_at = case when ? = 'RESOLVED' then now() else resolved_at end,
                     closed_at = case when ? = 'CLOSED' then now() else closed_at end
                 where complaint_code = ?
                 """,
@@ -65,6 +67,8 @@ public class ComplaintRepository {
             assignedTo,
             responseText,
             resolutionNotes,
+            assignedTo,
+            status,
             status,
             complaintCode
         );
@@ -88,7 +92,10 @@ public class ComplaintRepository {
             rs.getString("assigned_to_user_code"),
             rs.getDate("expected_resolution_date") == null ? null : rs.getDate("expected_resolution_date").toLocalDate().toString(),
             rs.getString("response_text"),
-            rs.getString("resolution_notes")
+            rs.getString("resolution_notes"),
+            rs.getTimestamp("created_at") == null ? null : rs.getTimestamp("created_at").toLocalDateTime().toString(),
+            rs.getTimestamp("assigned_at") == null ? null : rs.getTimestamp("assigned_at").toLocalDateTime().toString(),
+            rs.getTimestamp("resolved_at") == null ? null : rs.getTimestamp("resolved_at").toLocalDateTime().toString()
         );
     }
 
@@ -96,7 +103,7 @@ public class ComplaintRepository {
         return """
             select c.complaint_code, cu.user_code as customer_code, b.booking_code, c.category, c.complaint_title,
                    c.complaint_description, c.contact_preference, c.complaint_status, au.user_code as assigned_to_user_code,
-                   c.expected_resolution_date, c.response_text, c.resolution_notes
+                   c.expected_resolution_date, c.response_text, c.resolution_notes, c.created_at, c.assigned_at, c.resolved_at
             from complaints c
             join users cu on cu.user_id = c.customer_id
             left join bookings b on b.booking_id = c.booking_id

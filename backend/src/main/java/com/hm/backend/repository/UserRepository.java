@@ -54,12 +54,57 @@ public class UserRepository {
         return results.stream().findFirst();
     }
 
+    public Optional<UserRecord> findByUsernameEmailAndPhone(String username, String email, String phoneNumber) {
+        String sql = """
+            select user_id, user_code, full_name, email, country_code, phone_number, address_line, username,
+                   password_hash, role, account_status, failed_login_attempts, first_login_required
+            from users
+            where lower(username) = lower(?) and lower(email) = lower(?) and phone_number = ?
+            """;
+        List<UserRecord> results = jdbcTemplate.query(sql, (rs, rowNum) -> new UserRecord(
+            rs.getLong("user_id"),
+            rs.getString("user_code"),
+            rs.getString("full_name"),
+            rs.getString("email"),
+            rs.getString("country_code"),
+            rs.getString("phone_number"),
+            rs.getString("address_line"),
+            rs.getString("username"),
+            rs.getString("password_hash"),
+            rs.getString("role"),
+            rs.getString("account_status"),
+            rs.getInt("failed_login_attempts"),
+            rs.getBoolean("first_login_required")
+        ), username, email, phoneNumber);
+        return results.stream().findFirst();
+    }
+
     public boolean existsByEmail(String email) {
         return exists("select count(*) from users where email = ?", email);
     }
 
+    public boolean existsByEmailForOtherUser(String email, String userCode) {
+        Integer count = jdbcTemplate.queryForObject(
+            "select count(*) from users where email = ? and user_code <> ?",
+            Integer.class,
+            email,
+            userCode
+        );
+        return count != null && count > 0;
+    }
+
     public boolean existsByPhone(String phoneNumber) {
         return exists("select count(*) from users where phone_number = ?", phoneNumber);
+    }
+
+    public boolean existsByPhoneForOtherUser(String phoneNumber, String userCode) {
+        Integer count = jdbcTemplate.queryForObject(
+            "select count(*) from users where phone_number = ? and user_code <> ?",
+            Integer.class,
+            phoneNumber,
+            userCode
+        );
+        return count != null && count > 0;
     }
 
     public boolean existsByUsername(String username) {
@@ -82,6 +127,14 @@ public class UserRepository {
             values (?, ?, ?, ?, ?, ?, ?, ?, 'CUSTOMER', 'ACTIVE', 0, false)
             """;
         jdbcTemplate.update(sql, userCode, fullName, email, countryCode, phoneNumber, address, username, passwordHash);
+    }
+
+    public void updatePassword(long userId, String passwordHash) {
+        jdbcTemplate.update(
+            "update users set password_hash = ?, failed_login_attempts = 0, account_status = 'ACTIVE' where user_id = ?",
+            passwordHash,
+            userId
+        );
     }
 
     public void updateLoginState(long userId, int failedAttempts, String accountStatus) {
@@ -125,6 +178,24 @@ public class UserRepository {
         );
     }
 
+    public List<UserSummary> findUsersPage(int limit, int offset, String sortColumn, String sortDirection, String search, String role) {
+        String where = userWhereClause(search, role);
+        return jdbcTemplate.query(
+            """
+                select user_code, full_name, email, country_code, phone_number, address_line, username, role, account_status
+                from users
+                """ + where + " order by " + sortColumn + " " + sortDirection + " limit ? offset ?",
+            USER_SUMMARY_ROW_MAPPER,
+            limit,
+            offset
+        );
+    }
+
+    public long countUsers(String search, String role) {
+        Long count = jdbcTemplate.queryForObject("select count(*) from users " + userWhereClause(search, role), Long.class);
+        return count == null ? 0 : count;
+    }
+
     public void updateStatus(String userCode, String status) {
         jdbcTemplate.update("update users set account_status = ? where user_code = ?", status, userCode);
     }
@@ -150,6 +221,19 @@ public class UserRepository {
     private boolean exists(String sql, String value) {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, value);
         return count != null && count > 0;
+    }
+
+    private String userWhereClause(String search, String role) {
+        StringBuilder where = new StringBuilder(" where 1=1 ");
+        if (search != null && !search.isBlank()) {
+            String escaped = search.trim().replace("'", "''").toLowerCase();
+            where.append(" and (lower(username) like '%").append(escaped).append("%' or lower(email) like '%")
+                .append(escaped).append("%' or lower(full_name) like '%").append(escaped).append("%') ");
+        }
+        if (role != null && !role.isBlank()) {
+            where.append(" and role = '").append(role.trim().toUpperCase().replace("'", "''")).append("' ");
+        }
+        return where.toString();
     }
 
     public record UserRecord(

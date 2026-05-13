@@ -3,7 +3,13 @@
     <h2>Admin Portal</h2>
     <p class="muted">This screen covers room, reservation, user, bill, and complaint management based on the workbook backlog.</p>
   </div>
-  <button class="button-secondary" type="button" (click)="logout()">Logout</button>
+  <div class="auth-actions">
+    <button class="profile-chip" type="button" (click)="setSection('profile')">
+      <span class="avatar">{{ currentUser()?.name?.charAt(0) || 'A' }}</span>
+      View Profile
+    </button>
+    <button class="button-secondary" type="button" (click)="logout()">Logout</button>
+  </div>
 </section>
 
 <section class="panel tabs">
@@ -133,7 +139,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (room of rooms; track room.id) {
+            @for (room of paginatedRooms; track room.id) {
               <tr>
                 <td>{{ room.cityName }}</td>
                 <td>{{ room.hotelName }}</td>
@@ -147,6 +153,16 @@
             }
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar pagination-footer">
+        <div class="pagination-actions">
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('rooms', roomPage - 1)" [disabled]="roomPage === 1">‹</button>
+          <span class="page-indicator">{{ pageSummary(roomPage, roomPageSize, rooms.length) }}</span>
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('rooms', roomPage + 1)" [disabled]="roomPage === roomTotalPages">›</button>
+          <select [ngModel]="roomPageSize" (ngModelChange)="setPageSize('rooms', $event)" [ngModelOptions]="{ standalone: true }">
+            @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+          </select>
+        </div>
       </div>
     </div>
   </section>
@@ -235,6 +251,31 @@
     <div class="panel">
       <h3>All Reservations</h3>
       <input class="search-box" type="text" [(ngModel)]="reservationSearch" [ngModelOptions]="{ standalone: true }" placeholder="Search by booking ID, guest, room number" />
+      <div class="form-grid compact-form">
+        <label>
+          Date
+          <input type="date" [(ngModel)]="reservationDateFilter" [ngModelOptions]="{ standalone: true }" />
+        </label>
+        <label>
+          Status
+          <select [(ngModel)]="reservationStatusFilter" [ngModelOptions]="{ standalone: true }">
+            <option value="">All statuses</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Checked-in">Checked-in</option>
+            <option value="Checked-out">Checked-out</option>
+            <option value="Canceled">Canceled</option>
+          </select>
+        </label>
+        <label>
+          Payment
+          <select [(ngModel)]="reservationPaymentFilter" [ngModelOptions]="{ standalone: true }">
+            <option value="">All payments</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Partially Paid">Partially Paid</option>
+          </select>
+        </label>
+      </div>
       <div class="table-wrapper">
         <table>
           <thead>
@@ -250,7 +291,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (reservation of reservations; track reservation.bookingId) {
+            @for (reservation of paginatedReservations; track reservation.bookingId) {
               <tr>
                 <td>{{ reservation.bookingId }}</td>
                 <td>{{ reservation.customerName }}</td>
@@ -259,11 +300,24 @@
                 <td>{{ reservation.checkIn }} - {{ reservation.checkOut }}</td>
                 <td>{{ reservation.status }}</td>
                 <td>Rs {{ reservation.amount }}</td>
-                <td><button class="button-secondary" type="button" (click)="cancelReservation(reservation.bookingId)">Cancel</button></td>
+                <td>
+                  <button class="button-secondary" type="button" (click)="cancelReservation(reservation.bookingId)">Cancel</button>
+                  <button class="button-secondary" type="button" (click)="downloadReservationReceipt(reservation.bookingId)">PDF</button>
+                </td>
               </tr>
             }
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar pagination-footer">
+        <div class="pagination-actions">
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('reservations', reservationPage - 1)" [disabled]="reservationPage === 1">‹</button>
+          <span class="page-indicator">{{ pageSummary(reservationPage, reservationPageSize, reservations.length) }}</span>
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('reservations', reservationPage + 1)" [disabled]="reservationPage === reservationTotalPages">›</button>
+          <select [ngModel]="reservationPageSize" (ngModelChange)="setPageSize('reservations', $event)" [ngModelOptions]="{ standalone: true }">
+            @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+          </select>
+        </div>
       </div>
     </div>
   </section>
@@ -286,7 +340,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (user of users; track user.userId) {
+          @for (user of paginatedUsers; track user.userId) {
             <tr>
               <td>{{ user.userId }}</td>
               <td>{{ user.username }}</td>
@@ -302,6 +356,16 @@
           }
         </tbody>
       </table>
+    </div>
+    <div class="pagination-bar pagination-footer">
+      <div class="pagination-actions">
+        <button class="button-secondary pager-arrow" type="button" (click)="setPage('users', userPage - 1)" [disabled]="userPage === 1">‹</button>
+        <span class="page-indicator">{{ pageSummary(userPage, userPageSize, users.length) }}</span>
+        <button class="button-secondary pager-arrow" type="button" (click)="setPage('users', userPage + 1)" [disabled]="userPage === userTotalPages">›</button>
+        <select [ngModel]="userPageSize" (ngModelChange)="setPageSize('users', $event)" [ngModelOptions]="{ standalone: true }">
+          @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+        </select>
+      </div>
     </div>
   </section>
 }
@@ -367,7 +431,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (bill of bills; track bill.billId) {
+            @for (bill of paginatedBills; track bill.billId) {
               <tr>
                 <td>{{ bill.billId }}</td>
                 <td>{{ bill.customerName }}</td>
@@ -378,6 +442,16 @@
             }
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar pagination-footer">
+        <div class="pagination-actions">
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('bills', billPage - 1)" [disabled]="billPage === 1">‹</button>
+          <span class="page-indicator">{{ pageSummary(billPage, billPageSize, bills.length) }}</span>
+          <button class="button-secondary pager-arrow" type="button" (click)="setPage('bills', billPage + 1)" [disabled]="billPage === billTotalPages">›</button>
+          <select [ngModel]="billPageSize" (ngModelChange)="setPageSize('bills', $event)" [ngModelOptions]="{ standalone: true }">
+            @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+          </select>
+        </div>
       </div>
     </div>
   </section>
@@ -399,7 +473,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (complaint of complaints; track complaint.complaintId) {
+          @for (complaint of paginatedComplaints; track complaint.complaintId) {
             <tr>
               <td>{{ complaint.complaintId }}</td>
               <td>{{ complaint.userId }}</td>
@@ -419,7 +493,8 @@
               </td>
               <td>
                 <select #statusSelect>
-                  <option value="Open">Open</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Assigned">Assigned</option>
                   <option value="In Progress">In Progress</option>
                   <option value="Resolved">Resolved</option>
                   <option value="Closed">Closed</option>
@@ -431,5 +506,94 @@
         </tbody>
       </table>
     </div>
+    <div class="pagination-bar pagination-footer">
+      <div class="pagination-actions">
+        <button class="button-secondary pager-arrow" type="button" (click)="setPage('complaints', complaintPage - 1)" [disabled]="complaintPage === 1">‹</button>
+        <span class="page-indicator">{{ pageSummary(complaintPage, complaintPageSize, complaints.length) }}</span>
+        <button class="button-secondary pager-arrow" type="button" (click)="setPage('complaints', complaintPage + 1)" [disabled]="complaintPage === complaintTotalPages">›</button>
+        <select [ngModel]="complaintPageSize" (ngModelChange)="setPageSize('complaints', $event)" [ngModelOptions]="{ standalone: true }">
+          @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+        </select>
+      </div>
+    </div>
   </section>
+}
+
+@if (activeSection === 'profile') {
+  <section class="panel">
+    <div class="step-header">
+      <div>
+        <h3>Admin Profile</h3>
+        <p class="muted">View profile details, update contact information, or change the profile picture.</p>
+      </div>
+      @if (!profileEditMode) {
+        <button class="button-secondary" type="button" (click)="setProfileEditMode(true)">Edit Profile</button>
+      }
+    </div>
+
+    <div class="profile-layout profile-layout-single">
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="form-grid">
+        <label>
+          User ID
+          <input type="text" formControlName="userId" />
+        </label>
+        <label>
+          Full Name
+          <input type="text" formControlName="name" />
+          @if (profileForm.controls.name.touched && profileForm.controls.name.invalid) {
+            <span class="error-text">Use 2 to 50 alphabetic characters and spaces only.</span>
+          }
+        </label>
+        <label>
+          Email
+          <input type="email" formControlName="email" />
+          @if (profileForm.controls.email.touched && profileForm.controls.email.invalid) {
+            <span class="error-text">Invalid email format.</span>
+          }
+        </label>
+        <div class="split-field">
+          <label>
+            Country Code
+            <select formControlName="countryCode">
+              @for (code of hotel.countryCodes; track code) { <option [value]="code">{{ code }}</option> }
+            </select>
+          </label>
+          <label>
+            Phone Number
+            <input type="text" formControlName="mobile" />
+            @if (profileForm.controls.mobile.touched && profileForm.controls.mobile.invalid) {
+              <span class="error-text">Enter a valid phone number for the selected country.</span>
+            }
+          </label>
+        </div>
+        <label class="full-span">
+          Address
+          <textarea rows="3" formControlName="address"></textarea>
+        </label>
+        @if (profileEditMode) {
+          <div class="form-actions full-span">
+            <button class="button-primary" type="submit" [disabled]="profileForm.invalid">Save</button>
+            <button class="button-secondary" type="button" (click)="cancelProfileEdit()">Cancel</button>
+          </div>
+        }
+      </form>
+    </div>
+
+    @if (profileMessage) {
+      <p class="status-note">{{ profileMessage }}</p>
+    }
+  </section>
+}
+
+@if (confirmDialog; as dialog) {
+  <div class="modal-backdrop">
+    <section class="modal-card panel" role="dialog" aria-modal="true">
+      <h3>{{ dialog.title }}</h3>
+      <p class="muted">{{ dialog.message }}</p>
+      <div class="form-actions">
+        <button class="button-secondary" type="button" (click)="closeConfirm()">Cancel</button>
+        <button class="button-primary" type="button" (click)="confirmAction()">{{ dialog.confirmText }}</button>
+      </div>
+    </section>
+  </div>
 }

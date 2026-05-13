@@ -14,6 +14,12 @@ export class AppComponent {
 
   showPublicTopbar(): boolean {
     const isCustomerArea = this.router.url.startsWith('/customer');
-    return !(isCustomerArea && this.hotel.ensureRoleSession('customer'));
+    const isAdminArea = this.router.url.startsWith('/admin');
+    const isStaffArea = this.router.url.startsWith('/staff');
+    return !(
+      (isCustomerArea && this.hotel.ensureRoleSession('customer')) ||
+      (isAdminArea && this.hotel.ensureRoleSession('admin')) ||
+      (isStaffArea && this.hotel.ensureRoleSession('staff'))
+    );
   }
 }

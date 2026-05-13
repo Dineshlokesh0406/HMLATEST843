@@ -59,6 +59,10 @@
           </div>
 
           <p class="muted"><strong>Amenities:</strong> {{ room.amenities.join(', ') }}</p>
+
+          <div class="card-actions">
+            <button class="button-primary" type="button" [disabled]="!room.available" (click)="bookNow(room)">Book Now</button>
+          </div>
         </article>
       }
     </div>

@@ -7,7 +7,6 @@
 .acknowledgement {
   background: linear-gradient(180deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.3));
   border: 1px solid rgba(245, 158, 11, 0.25);
-  border-radius: 24px;
   padding: 1.5rem;
 }
 
@@ -16,3 +15,4 @@
     grid-template-columns: 1fr;
   }
 }
+

@@ -20,26 +20,50 @@ public final class ValidationUtils {
 
     public static String normalizeEmail(String email) {
         String normalized = requireTrimmed(email, "Email").toLowerCase();
-        if (!normalized.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            throw new ApiException("Enter a valid email address.");
+        if (!normalized.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new ApiException("Invalid email format.");
         }
         return normalized;
     }
 
     public static String validateFullName(String fullName) {
         String normalized = requireTrimmed(fullName, "Full name");
-        if (!normalized.matches("^[A-Za-z ]{3,}$")) {
-            throw new ApiException("Name must be at least 3 characters long and contain only letters.");
+        if (normalized.length() > 50) {
+            throw new ApiException("Name cannot exceed 50 characters.");
+        }
+        if (!normalized.matches("^[A-Za-z ]{3,50}$")) {
+            throw new ApiException("Name must contain only alphabetic characters and spaces.");
+        }
+        return normalized;
+    }
+
+    public static String validatePhone(String phone, String countryCode) {
+        String normalized = requireTrimmed(phone, "Phone number");
+        String code = requireTrimmed(countryCode, "Country code");
+        if (!normalized.matches("^\\d+$")) {
+            throw new ApiException("Invalid phone number.");
+        }
+        int expectedLength = switch (code) {
+            case "+91" -> 10;
+            case "+1" -> 10;
+            case "+44" -> 10;
+            case "+61" -> 9;
+            default -> throw new ApiException("Unsupported country code.");
+        };
+        if (normalized.length() < expectedLength) {
+            throw new ApiException("Phone number too short.");
+        }
+        if (normalized.length() > expectedLength) {
+            throw new ApiException("Phone number too long.");
+        }
+        if ("+91".equals(code) && !normalized.matches("^[6-9]\\d{9}$")) {
+            throw new ApiException("Invalid phone number.");
         }
         return normalized;
     }
 
     public static String validatePhone(String phone) {
-        String normalized = requireTrimmed(phone, "Phone number");
-        if (!normalized.matches("^[6-9]\\d{7,9}$")) {
-            throw new ApiException("Enter a valid Indian mobile number starting with 6 to 9.");
-        }
-        return normalized;
+        return validatePhone(phone, "+91");
     }
 
     public static String validatePassword(String password) {

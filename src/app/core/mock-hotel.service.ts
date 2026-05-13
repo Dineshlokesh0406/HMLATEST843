@@ -94,6 +94,9 @@ interface ComplaintResponseDto {
   expectedResolutionDate: string | null;
   responseText: string | null;
   resolutionNotes: string | null;
+  createdAt: string | null;
+  assignedAt: string | null;
+  resolvedAt: string | null;
 }
 
 interface BillResponseDto {
@@ -112,6 +115,20 @@ interface BillResponseDto {
 
 interface ApiMessageDto {
   message: string;
+}
+
+interface PasswordResetStartDto {
+  message: string;
+  resetToken: string;
+  tokenExpiresAt: string;
+}
+
+interface PageResponseDto<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 @Injectable({
@@ -178,6 +195,26 @@ export class MockHotelService {
     } catch (error) {
       return { success: false, message: this.extractError(error) };
     }
+  }
+
+  async startPasswordReset(username: string, email: string, phoneNumber: string): Promise<PasswordResetStartDto> {
+    return firstValueFrom(
+      this.http.post<PasswordResetStartDto>(`${this.apiBase}/auth/forgot-password`, {
+        username: username.trim(),
+        phoneNumber: phoneNumber.replace(/\D/g, ''),
+        email: email.trim().toLowerCase()
+      })
+    );
+  }
+
+  async resetPassword(token: string, newPassword: string, confirmPassword: string): Promise<ApiMessageDto> {
+    return firstValueFrom(
+      this.http.post<ApiMessageDto>(`${this.apiBase}/auth/reset-password`, {
+        token,
+        newPassword,
+        confirmPassword
+      })
+    );
   }
 
   async getCustomerCities(): Promise<CityOption[]> {
@@ -371,6 +408,20 @@ export class MockHotelService {
     return { message: response.message, refundAmount: 0 };
   }
 
+  async downloadBookingReceipt(bookingId: string): Promise<void> {
+    const current = this.requireCurrentUser();
+    const endpoint = current.role === 'admin'
+      ? `${this.apiBase}/admin/reservations/${bookingId}/receipt`
+      : `${this.apiBase}/customer/bookings/${bookingId}/receipt`;
+    const blob = await firstValueFrom(this.http.get(endpoint, { responseType: 'blob' }));
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${bookingId}-receipt.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   async createComplaint(payload: Omit<Complaint, 'complaintId' | 'status' | 'submittedOn' | 'expectedResolution' | 'priority'>): Promise<Complaint> {
     const response = await firstValueFrom(
       this.http.post<ApiMessageDto>(`${this.apiBase}/customer/complaints`, {
@@ -526,7 +577,9 @@ export class MockHotelService {
   }
 
   async loadAdminData(): Promise<void> {
+    const current = this.requireCurrentUser();
     await Promise.all([
+      this.fetchCustomerProfile(current.userId),
       this.loadRooms(),
       this.loadReservations(),
       this.loadUsers(),
@@ -536,7 +589,11 @@ export class MockHotelService {
   }
 
   async loadStaffData(): Promise<void> {
-    await this.loadAdminComplaints();
+    const current = this.requireCurrentUser();
+    await Promise.all([
+      this.fetchCustomerProfile(current.userId),
+      this.loadAdminComplaints()
+    ]);
   }
 
   private async refreshCustomerContext(userCode: string): Promise<void> {
@@ -584,7 +641,10 @@ export class MockHotelService {
   }
 
   private async loadReservations(): Promise<void> {
-    const dtos = await firstValueFrom(this.http.get<BookingResponseDto[]>(`${this.apiBase}/admin/reservations`));
+    const page = await firstValueFrom(
+      this.http.get<PageResponseDto<BookingResponseDto>>(`${this.apiBase}/admin/reservations/page?page=0&size=100&sort=bookedAt&direction=desc`)
+    );
+    const dtos = page.content;
     this.bookingsSignal.set(dtos.map((booking) => this.mapBooking(booking, null)));
   }
 
@@ -599,7 +659,10 @@ export class MockHotelService {
   }
 
   private async loadUsers(): Promise<void> {
-    const dtos = await firstValueFrom(this.http.get<UserSummaryDto[]>(`${this.apiBase}/admin/users`));
+    const page = await firstValueFrom(
+      this.http.get<PageResponseDto<UserSummaryDto>>(`${this.apiBase}/admin/users/page?page=0&size=100&sort=userId&direction=asc`)
+    );
+    const dtos = page.content;
     this.usersSignal.set(dtos.map((user) => ({
       userId: user.userCode,
       name: user.fullName,
@@ -714,6 +777,8 @@ export class MockHotelService {
       response: dto.responseText ?? undefined,
       resolutionNotes: dto.resolutionNotes ?? undefined,
       assignedTo: dto.assignedToUserCode ?? undefined,
+      assignedAt: dto.assignedAt ?? undefined,
+      resolvedAt: dto.resolvedAt ?? undefined,
       priority: 'Medium'
     };
   }
@@ -755,6 +820,9 @@ export class MockHotelService {
   private mapComplaintStatus(value: string): Complaint['status'] {
     if (value === 'IN_PROGRESS') {
       return 'In Progress';
+    }
+    if (value === 'PENDING') {
+      return 'Pending';
     }
     return value.charAt(0) + value.slice(1).toLowerCase() as Complaint['status'];
   }

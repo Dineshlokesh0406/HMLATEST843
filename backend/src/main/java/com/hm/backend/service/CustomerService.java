@@ -52,12 +52,21 @@ public class CustomerService {
     }
 
     public ApiResponse updateProfile(String userCode, ProfileUpdateRequest request) {
+        String email = ValidationUtils.normalizeEmail(request.email());
+        String countryCode = ValidationUtils.requireTrimmed(request.countryCode(), "Country code");
+        String phoneNumber = ValidationUtils.validatePhone(request.phoneNumber(), countryCode);
+        if (userRepository.existsByEmailForOtherUser(email, userCode)) {
+            throw new ApiException("Email already exists.");
+        }
+        if (userRepository.existsByPhoneForOtherUser(phoneNumber, userCode)) {
+            throw new ApiException("Mobile number already registered.");
+        }
         userRepository.updateProfile(
             userCode,
             ValidationUtils.validateFullName(request.fullName()),
-            ValidationUtils.normalizeEmail(request.email()),
-            ValidationUtils.requireTrimmed(request.countryCode(), "Country code"),
-            ValidationUtils.validatePhone(request.phoneNumber()),
+            email,
+            countryCode,
+            phoneNumber,
             ValidationUtils.requireTrimmed(request.address(), "Address")
         );
         return new ApiResponse("Your profile has been updated successfully.");
@@ -162,7 +171,9 @@ public class CustomerService {
         if (bookingRepository.hasOverlap(room.roomId(), checkIn, checkOut, bookingCode)) {
             throw new ApiException("Selected room type is fully booked for these dates.");
         }
-        bookingRepository.updateBooking(bookingCode, checkIn, checkOut, adults, children, room.roomId());
+        long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
+        BigDecimal totalAmount = room.pricePerNight().multiply(BigDecimal.valueOf(nights)).multiply(BigDecimal.valueOf(1.18));
+        bookingRepository.updateBooking(bookingCode, checkIn, checkOut, adults, children, room.roomId(), totalAmount);
         return new ApiResponse("Your booking has been successfully modified.");
     }
 
@@ -185,9 +196,19 @@ public class CustomerService {
     public ApiResponse createComplaint(ComplaintCreateRequest request) {
         Long customerId = userRepository.findIdByUserCode(request.customerCode())
             .orElseThrow(() -> new ApiException("Customer not found."));
-        Long bookingId = request.bookingCode() == null || request.bookingCode().isBlank()
-            ? null
-            : bookingRepository.findBookingDetails(request.bookingCode()).bookingId();
+        Long bookingId = null;
+        if (request.bookingCode() == null || request.bookingCode().isBlank()) {
+            throw new ApiException("Booking is required for complaint submission.");
+        }
+        BookingDetails booking = bookingRepository.findBookingDetails(request.bookingCode());
+        if (booking.customerId() != customerId) {
+            throw new ApiException("You can raise complaints only for your own bookings.");
+        }
+        LocalDate today = LocalDate.now();
+        if (today.isBefore(booking.checkInDate()) || today.isAfter(booking.checkOutDate().plusDays(7))) {
+            throw new ApiException("Complaints can be raised during the active booking or up to 1 week after checkout.");
+        }
+        bookingId = booking.bookingId();
 
         String title = ValidationUtils.requireTrimmed(request.complaintTitle(), "Complaint title");
         String description = ValidationUtils.requireTrimmed(request.complaintDescription(), "Complaint description");
@@ -217,9 +238,13 @@ public class CustomerService {
     }
 
     public ApiResponse updateComplaintStatus(String complaintCode, ComplaintUpdateRequest request) {
+        String status = ValidationUtils.requireTrimmed(request.complaintStatus(), "Complaint status").toUpperCase().replace(' ', '_');
+        if (!List.of("PENDING", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "CLOSED").contains(status)) {
+            throw new ApiException("Unsupported complaint status.");
+        }
         complaintRepository.updateComplaint(
             complaintCode,
-            ValidationUtils.requireTrimmed(request.complaintStatus(), "Complaint status").toUpperCase(),
+            status,
             request.assignedToUserCode() == null || request.assignedToUserCode().isBlank()
                 ? null
                 : userRepository.findIdByUserCode(request.assignedToUserCode()).orElse(null),

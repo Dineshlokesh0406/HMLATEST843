@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MockHotelService } from '../../core/mock-hotel.service';
 import { CityOption, Room } from '../../core/models';
 
@@ -12,6 +13,7 @@ import { CityOption, Room } from '../../core/models';
 })
 export class LandingComponent {
   private readonly hotel = inject(MockHotelService);
+  private readonly router = inject(Router);
   private readonly pageSize = 9;
   private readonly cardImages: Record<string, string> = {
     GOA: 'assets/single.webp',
@@ -90,6 +92,17 @@ export class LandingComponent {
       return 'Family Pick | 4.4 star';
     }
     return 'Family Pick | 4.5 star';
+  }
+
+  bookNow(room: Room): void {
+    sessionStorage.setItem('hm.selectedLandingRoom', JSON.stringify({
+      cityCode: room.cityCode,
+      hotelCode: room.hotelCode,
+      roomType: room.roomType,
+      roomNumber: room.roomNumber
+    }));
+    const current = this.hotel.currentUser();
+    this.router.navigate([current?.role === 'customer' ? '/customer' : '/login']);
   }
 
   private async loadLandingData(): Promise<void> {

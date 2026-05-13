@@ -1,28 +1,39 @@
 package com.hm.backend.service;
 
+import com.hm.backend.dto.ApiResponse;
 import com.hm.backend.dto.AuthDtos.AuthResponse;
+import com.hm.backend.dto.AuthDtos.ForgotPasswordRequest;
 import com.hm.backend.dto.AuthDtos.LoginRequest;
+import com.hm.backend.dto.AuthDtos.PasswordResetStartResponse;
 import com.hm.backend.dto.AuthDtos.RegisterRequest;
+import com.hm.backend.dto.AuthDtos.ResetPasswordRequest;
 import com.hm.backend.exception.ApiException;
+import com.hm.backend.repository.PasswordResetRepository;
 import com.hm.backend.repository.UserRepository;
 import com.hm.backend.repository.UserRepository.UserRecord;
 import com.hm.backend.util.HashUtils;
 import com.hm.backend.util.ValidationUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordResetRepository passwordResetRepository;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, PasswordResetRepository passwordResetRepository) {
         this.userRepository = userRepository;
+        this.passwordResetRepository = passwordResetRepository;
     }
 
     public AuthResponse register(RegisterRequest request) {
         String fullName = ValidationUtils.validateFullName(request.fullName());
         String email = ValidationUtils.normalizeEmail(request.email());
-        String phoneNumber = ValidationUtils.validatePhone(request.phoneNumber());
+        String countryCode = request.countryCode() == null || request.countryCode().isBlank() ? "+91" : request.countryCode().trim();
+        String phoneNumber = ValidationUtils.validatePhone(request.phoneNumber(), countryCode);
         String address = ValidationUtils.requireTrimmed(request.address(), "Address");
         String username = ValidationUtils.requireTrimmed(request.username(), "Username");
         String password = ValidationUtils.validatePassword(request.password());
@@ -32,7 +43,7 @@ public class AuthService {
             throw new ApiException("Passwords do not match.");
         }
         if (userRepository.existsByEmail(email)) {
-            throw new ApiException("Email already registered.");
+            throw new ApiException("Email already exists.");
         }
         if (userRepository.existsByPhone(phoneNumber)) {
             throw new ApiException("Mobile number already registered.");
@@ -46,7 +57,7 @@ public class AuthService {
             userCode,
             fullName,
             email,
-            request.countryCode() == null || request.countryCode().isBlank() ? "+91" : request.countryCode().trim(),
+            countryCode,
             phoneNumber,
             address,
             username,
@@ -84,5 +95,43 @@ public class AuthService {
 
         userRepository.updateLoginState(user.userId(), 0, user.accountStatus());
         return new AuthResponse("Login successful.", user.userCode(), user.fullName(), user.email(), user.role());
+    }
+
+    public PasswordResetStartResponse startPasswordReset(ForgotPasswordRequest request) {
+        String username = ValidationUtils.requireTrimmed(request.username(), "Username");
+        String email = ValidationUtils.normalizeEmail(request.email());
+        String phoneNumber = ValidationUtils.requireTrimmed(request.phoneNumber(), "Phone number").replaceAll("\\D", "");
+        if (phoneNumber.isBlank()) {
+            throw new ApiException("Phone number is required.");
+        }
+        UserRecord user = userRepository.findByUsernameEmailAndPhone(username, email, phoneNumber)
+            .orElseThrow(() -> new ApiException("Username, email, and phone number do not match any active account."));
+        if ("LOCKED".equalsIgnoreCase(user.accountStatus())) {
+            throw new ApiException("Your account is locked. Please contact support.");
+        }
+
+        String resetToken = UUID.randomUUID().toString() + "-" + UUID.randomUUID();
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
+        passwordResetRepository.invalidateForUser(user.userId());
+        passwordResetRepository.create(user.userId(), HashUtils.sha256("IDENTITY_VERIFIED"), HashUtils.sha256(resetToken), expiresAt);
+        return new PasswordResetStartResponse(
+            "Details verified. You can reset your password now.",
+            resetToken,
+            expiresAt.toString()
+        );
+    }
+
+    public ApiResponse resetPassword(ResetPasswordRequest request) {
+        String token = ValidationUtils.requireTrimmed(request.token(), "Reset token");
+        String password = ValidationUtils.validatePassword(request.newPassword());
+        String confirmPassword = ValidationUtils.requireTrimmed(request.confirmPassword(), "Confirm password");
+        if (!password.equals(confirmPassword)) {
+            throw new ApiException("Passwords do not match.");
+        }
+        var reset = passwordResetRepository.findActiveByToken(HashUtils.sha256(token))
+            .orElseThrow(() -> new ApiException("Reset token is invalid or expired."));
+        userRepository.updatePassword(reset.userId(), HashUtils.sha256(password));
+        passwordResetRepository.markUsed(reset.resetId());
+        return new ApiResponse("Password reset successful. Please login with your new password.");
     }
 }

@@ -28,19 +28,70 @@
         <a class="text-link" routerLink="/register">Register Now</a>
       </div>
 
-      <div class="form-actions full-span">
-        <a class="text-link" href="javascript:void(0)">Forgot Password?</a>
-      </div>
+      <button class="text-link forgot-inline full-span" type="button" (click)="toggleForgotPassword()">Forgot Password?</button>
     </form>
 
     @if (loginMessage) {
       <p class="status-note">{{ loginMessage }}</p>
     }
+
+    @if (forgotPasswordOpen) {
+      <div class="forgot-box">
+        <h3>Reset Password</h3>
+
+        @if (forgotPasswordStep === 'verify') {
+          <label>
+            Username
+            <input type="text" [formControl]="forgotPasswordForm.controls.username" placeholder="Enter username" />
+            @if (forgotPasswordForm.controls.username.touched && forgotPasswordForm.controls.username.invalid) {
+              <span class="error-text">Username is required.</span>
+            }
+          </label>
+
+          <label>
+            Registered Email
+            <input type="email" [formControl]="forgotPasswordForm.controls.email" placeholder="example@domain.com" (blur)="normalizeForgotPasswordEmail()" />
+            @if (forgotPasswordForm.controls.email.touched && forgotPasswordForm.controls.email.invalid) {
+              <span class="error-text">Invalid email format.</span>
+            }
+          </label>
+
+          <label>
+            Phone Number
+            <input type="text" [formControl]="forgotPasswordForm.controls.phoneNumber" maxlength="15" placeholder="Registered phone number" (input)="normalizeForgotPasswordPhone()" />
+            @if (forgotPasswordForm.controls.phoneNumber.touched && forgotPasswordForm.controls.phoneNumber.invalid) {
+              <span class="error-text">Enter the registered phone number using digits only.</span>
+            }
+          </label>
+
+          <button class="button-secondary" type="button" (click)="verifyResetIdentity()">Verify Details</button>
+        }
+
+        @if (forgotPasswordStep === 'reset') {
+          <label>
+            New Password
+            <input type="password" [formControl]="forgotPasswordForm.controls.newPassword" />
+          </label>
+          <label>
+            Confirm Password
+            <input type="password" [formControl]="forgotPasswordForm.controls.confirmPassword" />
+            @if (forgotPasswordForm.controls.confirmPassword.touched && forgotPasswordForm.controls.confirmPassword.invalid) {
+              <span class="error-text">Passwords must match and meet strength rules.</span>
+            }
+          </label>
+          <button class="button-secondary" type="button" (click)="resetPassword()">Reset Password</button>
+        }
+
+        @if (forgotPasswordMessage) {
+          <p class="status-note">{{ forgotPasswordMessage }}</p>
+        }
+      </div>
+    }
   </div>
 
   <aside class="auth-side">
-    <h3>Forgot Password?</h3>
-    <p>This frontend currently shows the login flow only. We can add the reset-password page in the next step if you want it before backend work.</p>
+    <h3>Demo Credentials</h3>
+    <p class="muted">Use these seeded users to review each dashboard.</p>
     <ul>
       <li>Customer: aarav / Cust&#64;123</li>
       <li>Admin: admin / Admin&#64;123</li>
@@ -48,3 +99,16 @@
     </ul>
   </aside>
 </section>
+
+@if (loginConfirmRole) {
+  <div class="modal-backdrop">
+    <section class="modal-card panel" role="dialog" aria-modal="true">
+      <h3>Login successful</h3>
+      <p class="muted">Continue to your dashboard?</p>
+      <div class="form-actions">
+        <button class="button-secondary" type="button" (click)="closeLoginConfirm()">Stay Here</button>
+        <button class="button-primary" type="button" (click)="continueAfterLogin()">Continue</button>
+      </div>
+    </section>
+  </div>
+}

@@ -207,6 +207,7 @@
         <p class="payment-kicker">CUSTOMER PAYMENT</p>
         <h3>Complete Card Payment</h3>
         <p class="payment-subtitle">Use the demo card form below to finish the booking flow for your selected room.</p>
+        <p class="status-note">Payment session expires in {{ formatPaymentTime() }}.</p>
       </div>
 
       <div class="payment-layout payment-layout-reference">
@@ -300,23 +301,36 @@
             <div class="payment-form-grid">
               <label class="full-span">
                 Name on card
-                <input type="text" formControlName="cardholderName" placeholder="Enter cardholder name" />
+                <input type="text" formControlName="cardholderName" placeholder="Enter cardholder name" maxlength="50" (input)="normalizeCardholderName()" />
+                @if (paymentForm.controls.cardholderName.touched && paymentForm.controls.cardholderName.invalid) {
+                  <span class="error-text">Cardholder name must contain only letters and spaces.</span>
+                }
               </label>
               <label class="full-span">
                 Card number
-                <input type="text" formControlName="cardNumber" placeholder="1234123412341234" (input)="normalizeDigits('cardNumber', 16)" />
+                <input type="text" formControlName="cardNumber" placeholder="1234 1234 1234 1234" maxlength="19" (input)="normalizeCardNumber()" />
+                @if (paymentForm.controls.cardNumber.touched && paymentForm.controls.cardNumber.invalid) {
+                  <span class="error-text">Card number must be exactly 16 digits.</span>
+                }
               </label>
               <label>
                 Expiry (MM/YY)
                 <input type="text" formControlName="expiryDate" placeholder="08/29" (input)="normalizeExpiry()" />
+                @if (paymentForm.controls.expiryDate.touched && paymentForm.controls.expiryDate.invalid) {
+                  <span class="error-text">Use a future expiry date in MM/YY format.</span>
+                }
               </label>
               <label>
                 CVV
                 <input type="password" formControlName="cvv" placeholder="123" (input)="normalizeDigits('cvv', 3)" />
+                @if (paymentForm.controls.cvv.touched && paymentForm.controls.cvv.invalid) {
+                  <span class="error-text">CVV must be exactly 3 digits.</span>
+                }
               </label>
               <label class="full-span">
                 Billing Address
-                <textarea rows="2" formControlName="billingAddress" placeholder="Enter billing address"></textarea>
+                <textarea rows="2" formControlName="billingAddress" maxlength="120" placeholder="Enter billing address" (input)="limitTextarea('billingAddress', 120)"></textarea>
+                <span class="muted">{{ paymentForm.controls.billingAddress.value.length }}/120</span>
               </label>
             </div>
 
@@ -429,7 +443,7 @@
       <div>
         <h4>Upcoming Bookings</h4>
         @if (upcomingBookings.length) {
-          @for (booking of upcomingBookings; track booking.bookingId) {
+          @for (booking of paginatedUpcomingBookings; track booking.bookingId) {
             <article class="list-card">
               <p><strong>{{ booking.bookingId }}</strong> | {{ booking.hotelName }}, {{ booking.cityName }}</p>
               <p>Booked On: {{ booking.bookedOn }} | {{ booking.roomType }} | {{ booking.checkIn }} to {{ booking.checkOut }}</p>
@@ -437,9 +451,22 @@
               <div class="inline-actions">
                 <button class="button-secondary" type="button" (click)="startModify(booking)">Modify Booking</button>
                 <button class="button-secondary" type="button" (click)="requestCancelBookingConfirmation(booking)">Cancel Booking</button>
+                <button class="button-secondary" type="button" (click)="downloadBookingReceipt(booking)">Download PDF</button>
               </div>
             </article>
           }
+          <div class="pagination-bar pagination-footer">
+            <div class="pagination-actions">
+              <button class="button-secondary pager-arrow" type="button" (click)="setPage('upcoming', upcomingPage - 1)" [disabled]="upcomingPage === 1">‹</button>
+              <span class="page-indicator">{{ pageSummary(upcomingPage, upcomingPageSize, upcomingBookings.length) }}</span>
+              <button class="button-secondary pager-arrow" type="button" (click)="setPage('upcoming', upcomingPage + 1)" [disabled]="upcomingPage === upcomingTotalPages">›</button>
+              <select [ngModel]="upcomingPageSize" (ngModelChange)="setPageSize('upcoming', $event)" [ngModelOptions]="{ standalone: true }">
+                @for (size of pageSizes; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+            </div>
+          </div>
         } @else {
           <p class="muted">No bookings found. Start your journey by booking a room!</p>
         }
@@ -448,13 +475,28 @@
       <div>
         <h4>Past Bookings</h4>
         @if (pastBookings.length) {
-          @for (booking of pastBookings; track booking.bookingId) {
+          @for (booking of paginatedPastBookings; track booking.bookingId) {
             <article class="list-card">
               <p><strong>{{ booking.bookingId }}</strong> | {{ booking.hotelName }}, {{ booking.cityName }}</p>
               <p>Booked On: {{ booking.bookedOn }} | {{ booking.roomType }} | {{ booking.checkIn }} to {{ booking.checkOut }}</p>
               <p>Status: {{ booking.status }} | Payment: {{ booking.paymentStatus }} | Amount: Rs {{ booking.amount }}</p>
+              <div class="inline-actions">
+                <button class="button-secondary" type="button" (click)="downloadBookingReceipt(booking)">Download PDF</button>
+              </div>
             </article>
           }
+          <div class="pagination-bar pagination-footer">
+            <div class="pagination-actions">
+              <button class="button-secondary pager-arrow" type="button" (click)="setPage('past', pastPage - 1)" [disabled]="pastPage === 1">‹</button>
+              <span class="page-indicator">{{ pageSummary(pastPage, pastPageSize, pastBookings.length) }}</span>
+              <button class="button-secondary pager-arrow" type="button" (click)="setPage('past', pastPage + 1)" [disabled]="pastPage === pastTotalPages">›</button>
+              <select [ngModel]="pastPageSize" (ngModelChange)="setPageSize('past', $event)" [ngModelOptions]="{ standalone: true }">
+                @for (size of pageSizes; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+            </div>
+          </div>
         } @else {
           <p class="muted">No past bookings yet.</p>
         }
@@ -574,13 +616,25 @@
     <div class="panel">
       <h3>View Complaints</h3>
       @if (allComplaints().length) {
-        @for (complaint of allComplaints(); track complaint.complaintId) {
+        @for (complaint of paginatedComplaints; track complaint.complaintId) {
           <article class="list-card clickable" (click)="openComplaint(complaint)">
             <p><strong>{{ complaint.complaintId }}</strong> | {{ complaint.category }}</p>
             <p>{{ complaint.title }}</p>
             <p>Status: {{ complaint.status }} | Expected resolution: {{ complaint.expectedResolution }}</p>
           </article>
         }
+        <div class="pagination-bar pagination-footer">
+          <div class="pagination-actions">
+            <button class="button-secondary pager-arrow" type="button" (click)="setPage('complaints', complaintPage - 1)" [disabled]="complaintPage === 1">‹</button>
+            <span class="page-indicator">{{ pageSummary(complaintPage, complaintPageSize, allComplaints().length) }}</span>
+            <button class="button-secondary pager-arrow" type="button" (click)="setPage('complaints', complaintPage + 1)" [disabled]="complaintPage === complaintTotalPages">›</button>
+            <select [ngModel]="complaintPageSize" (ngModelChange)="setPageSize('complaints', $event)" [ngModelOptions]="{ standalone: true }">
+              @for (size of pageSizes; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+          </div>
+        </div>
       } @else {
         <p class="muted">You have not registered any complaints.</p>
       }
@@ -595,7 +649,7 @@
           @if (selectedComplaint.status === 'Resolved') {
             <div class="inline-actions">
               <button class="button-primary" type="button" (click)="updateComplaintStatus('Closed')">Confirm Resolution</button>
-              <button class="button-secondary" type="button" (click)="updateComplaintStatus('Open')">Reopen Complaint</button>
+              <button class="button-secondary" type="button" (click)="updateComplaintStatus('Pending')">Reopen Complaint</button>
             </div>
           }
         </div>
@@ -629,7 +683,15 @@
 
 @if (activeSection === 'profile') {
   <section class="panel">
-    <h3>My Profile</h3>
+    <div class="step-header">
+      <div>
+        <h3>My Profile</h3>
+        <p class="muted">Profile fields are read-only until you choose Edit Profile.</p>
+      </div>
+      @if (!profileEditMode) {
+        <button class="button-secondary" type="button" (click)="setProfileEditMode(true)">Edit Profile</button>
+      }
+    </div>
     <form [formGroup]="profileForm" (ngSubmit)="requestProfileSaveConfirmation()" class="form-grid">
       <label>
         User ID
@@ -665,7 +727,11 @@
           Phone Number
           <input type="text" formControlName="mobile" />
           @if (profileForm.controls.mobile.touched && profileForm.controls.mobile.invalid) {
-            <span class="error-text">Please enter a valid Indian phone number starting with 6 to 9.</span>
+            <span class="error-text">
+              {{ profileForm.controls.mobile.errors?.['phoneTooShort'] ? 'Phone number too short' : profileForm.controls.mobile.errors?.['phoneTooLong'] ? 'Phone number too long' : 'Invalid phone number' }}
+            </span>
+          } @else if (profileForm.controls.mobile.touched && profileForm.controls.mobile.valid) {
+            <span class="valid-text">Valid number</span>
           }
         </label>
       </div>
@@ -676,7 +742,10 @@
       </label>
 
       <div class="form-actions full-span">
-        <button class="button-primary" type="submit">Save Changes</button>
+        @if (profileEditMode) {
+          <button class="button-primary" type="submit">Save</button>
+          <button class="button-secondary" type="button" (click)="cancelProfileEdit()">Cancel</button>
+        }
       </div>
     </form>
 
@@ -700,7 +769,9 @@
       <p class="muted overlay-copy">{{ dialog.message }}</p>
 
       <div class="overlay-actions">
-        <button class="button-secondary" type="button" (click)="closeConfirmationDialog()">No, Go Back</button>
+        @if (!dialog.hideCancel) {
+          <button class="button-secondary" type="button" (click)="closeConfirmationDialog()">No, Go Back</button>
+        }
         <button class="button-primary overlay-confirm" type="button" (click)="confirmDialogAction()">{{ dialog.confirmText }}</button>
       </div>
     </div>

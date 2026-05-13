@@ -7,9 +7,12 @@ import { MockHotelService } from '../../core/mock-hotel.service';
 import { Booking, CityOption, Complaint, HotelOption, Room } from '../../core/models';
 import {
   afterDateValidator,
+  cardNumberValidator,
+  countryPhoneValidator,
+  cvvValidator,
+  emailFormatValidator,
   expiryDateValidator,
   futureOrTodayValidator,
-  indianPhoneValidator,
   lettersAndSpacesValidator,
   maxStayDurationValidator,
   positiveAmountValidator,
@@ -63,6 +66,7 @@ interface ConfirmationDialogState {
   title: string;
   message: string;
   confirmText: string;
+  hideCancel?: boolean;
 }
 
 @Component({
@@ -111,6 +115,9 @@ export class CustomerPortalComponent {
   bookingMessage = '';
   complaintMessage = '';
   profileMessage = '';
+  profileEditMode = false;
+  paymentSecondsRemaining = 300;
+  paymentExpired = false;
   editingBookingId: string | null = null;
   editingBooking: Booking | null = null;
   selectedComplaint: Complaint | null = null;
@@ -119,10 +126,19 @@ export class CustomerPortalComponent {
   amenityFilter = '';
   sizeFilter = 'all';
   private lastCapacityPromptGuestCount = 0;
+  private lastGuestLimitPromptCount = 0;
   private proceedToPaymentAfterCapacityPopup = false;
   private pendingConfirmationAction: (() => void | Promise<void>) | null = null;
+  private paymentTimerId: ReturnType<typeof setInterval> | null = null;
   cities: CityOption[] = [];
   hotels: HotelOption[] = [];
+  upcomingPage = 1;
+  pastPage = 1;
+  complaintPage = 1;
+  upcomingPageSize = 5;
+  pastPageSize = 5;
+  complaintPageSize = 5;
+  readonly pageSizes = [5, 10, 20];
 
   readonly filteredHomeRooms = computed(() => {
     const cityCode = this.selectedHomeCityCode();
@@ -247,10 +263,10 @@ export class CustomerPortalComponent {
 
   readonly paymentForm = this.fb.nonNullable.group({
     cardholderName: ['', [Validators.required, trimmedRequiredValidator(), Validators.minLength(3), Validators.maxLength(50), lettersAndSpacesValidator()]],
-    cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
+    cardNumber: ['', [Validators.required, cardNumberValidator()]],
     expiryDate: ['', [Validators.required, expiryDateValidator()]],
-    cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
-    billingAddress: ['', [Validators.minLength(5)]]
+    cvv: ['', [Validators.required, cvvValidator()]],
+    billingAddress: ['', [Validators.minLength(5), Validators.maxLength(120)]]
   });
 
   readonly complaintForm = this.fb.nonNullable.group({
@@ -264,9 +280,9 @@ export class CustomerPortalComponent {
   readonly profileForm = this.fb.nonNullable.group({
     userId: [{ value: '', disabled: true }],
     name: ['', [Validators.required, trimmedRequiredValidator(), Validators.minLength(3), Validators.maxLength(50), lettersAndSpacesValidator()]],
-    email: ['', [Validators.required, trimmedRequiredValidator(), Validators.email]],
+    email: ['', [Validators.required, trimmedRequiredValidator(), emailFormatValidator()]],
     countryCode: ['+91', Validators.required],
-    mobile: ['', [Validators.required, indianPhoneValidator()]],
+    mobile: ['', [Validators.required, countryPhoneValidator('countryCode')]],
     address: ['', [Validators.maxLength(100)]]
   });
 
@@ -305,6 +321,9 @@ export class CustomerPortalComponent {
     this.modifyForm.controls.checkIn.valueChanges.subscribe(() => {
       this.modifyForm.controls.checkOut.updateValueAndValidity();
     });
+    this.profileForm.controls.countryCode.valueChanges.subscribe(() => {
+      this.profileForm.controls.mobile.updateValueAndValidity();
+    });
     this.syncCalculatedAmount();
   }
 
@@ -313,9 +332,33 @@ export class CustomerPortalComponent {
     return this.customerBookings().filter((booking) => booking.checkOut >= today && booking.status !== 'Canceled');
   }
 
+  get paginatedUpcomingBookings(): Booking[] {
+    return this.paginate(this.upcomingBookings, this.upcomingPage, this.upcomingPageSize);
+  }
+
+  get upcomingTotalPages(): number {
+    return this.totalPages(this.upcomingBookings.length, this.upcomingPageSize);
+  }
+
   get pastBookings(): Booking[] {
     const today = new Date().toISOString().slice(0, 10);
     return this.customerBookings().filter((booking) => booking.checkOut < today || booking.status === 'Canceled');
+  }
+
+  get paginatedPastBookings(): Booking[] {
+    return this.paginate(this.pastBookings, this.pastPage, this.pastPageSize);
+  }
+
+  get pastTotalPages(): number {
+    return this.totalPages(this.pastBookings.length, this.pastPageSize);
+  }
+
+  get paginatedComplaints(): Complaint[] {
+    return this.paginate(this.allComplaints(), this.complaintPage, this.complaintPageSize);
+  }
+
+  get complaintTotalPages(): number {
+    return this.totalPages(this.allComplaints().length, this.complaintPageSize);
   }
 
   get eligibleComplaintBookings(): Booking[] {
@@ -359,6 +402,39 @@ export class CustomerPortalComponent {
     if (section === 'complaints' && !this.eligibleComplaintBookings.length) {
       this.complaintMessage = 'Complaints can be raised from check-in date until 7 days after checkout.';
     }
+  }
+
+  setPage(target: 'upcoming' | 'past' | 'complaints', page: number): void {
+    if (target === 'upcoming') {
+      this.upcomingPage = Math.min(Math.max(1, page), this.upcomingTotalPages);
+    } else if (target === 'past') {
+      this.pastPage = Math.min(Math.max(1, page), this.pastTotalPages);
+    } else {
+      this.complaintPage = Math.min(Math.max(1, page), this.complaintTotalPages);
+    }
+  }
+
+  setPageSize(target: 'upcoming' | 'past' | 'complaints', value: string): void {
+    const size = Number(value) || 5;
+    if (target === 'upcoming') {
+      this.upcomingPageSize = size;
+      this.upcomingPage = 1;
+    } else if (target === 'past') {
+      this.pastPageSize = size;
+      this.pastPage = 1;
+    } else {
+      this.complaintPageSize = size;
+      this.complaintPage = 1;
+    }
+  }
+
+  pageSummary(page: number, pageSize: number, total: number): string {
+    if (!total) {
+      return 'No items';
+    }
+    const start = (page - 1) * pageSize + 1;
+    const end = Math.min(start + pageSize - 1, total);
+    return `${start}-${end} of ${total}`;
   }
 
   updateHomeCity(value: string): void {
@@ -434,6 +510,8 @@ export class CustomerPortalComponent {
     this.showAdditionalRoomsPopup.set(false);
     this.lastCapacityPromptGuestCount = 0;
     this.proceedToPaymentAfterCapacityPopup = false;
+    this.paymentExpired = false;
+    this.stopPaymentTimer();
     this.bookingMessage = '';
     this.syncCalculatedAmount();
     this.homeStep.set('confirmation');
@@ -442,6 +520,9 @@ export class CustomerPortalComponent {
   continueToPayment(): void {
     if (this.confirmationForm.invalid || !this.selectedRoomCategory()) {
       this.confirmationForm.markAllAsTouched();
+      if (this.confirmationForm.controls.guestCount.errors?.['max']) {
+        this.showGuestLimitPopup();
+      }
       return;
     }
     if (this.roomsNeeded() > 1) {
@@ -449,6 +530,7 @@ export class CustomerPortalComponent {
       this.showAdditionalRoomsPopup.set(true);
       return;
     }
+    this.startPaymentTimer();
     this.homeStep.set('payment');
   }
 
@@ -457,6 +539,7 @@ export class CustomerPortalComponent {
     const shouldProceed = this.proceedToPaymentAfterCapacityPopup;
     this.proceedToPaymentAfterCapacityPopup = false;
     if (shouldProceed) {
+      this.startPaymentTimer();
       this.homeStep.set('payment');
     }
   }
@@ -467,6 +550,7 @@ export class CustomerPortalComponent {
   }
 
   backToConfirmation(): void {
+    this.stopPaymentTimer();
     this.homeStep.set('confirmation');
   }
 
@@ -514,6 +598,11 @@ export class CustomerPortalComponent {
 
   async submitPayment(): Promise<void> {
     if (!this.selectedRoomCategory() || !this.selectedHotelCard()) {
+      return;
+    }
+    if (this.paymentExpired) {
+      this.bookingMessage = 'Payment session expired. Please review your booking and start payment again.';
+      this.homeStep.set('confirmation');
       return;
     }
     if (this.bookingForm.invalid || this.confirmationForm.invalid || !this.validatePaymentDetails()) {
@@ -592,6 +681,7 @@ export class CustomerPortalComponent {
         paymentMethod: 'Card'
       });
       this.syncCalculatedAmount();
+      this.stopPaymentTimer();
       this.homeStep.set('success');
     } finally {
       this.processingPayment.set(false);
@@ -673,6 +763,14 @@ export class CustomerPortalComponent {
     }
   }
 
+  async downloadBookingReceipt(booking: Booking): Promise<void> {
+    try {
+      await this.hotel.downloadBookingReceipt(booking.bookingId);
+    } catch (error) {
+      this.bookingMessage = error instanceof Error ? error.message : 'Unable to download receipt.';
+    }
+  }
+
   requestCancelBookingConfirmation(booking: Booking): void {
     this.openConfirmationDialog({
       label: 'BOOKING CANCELLATION',
@@ -732,7 +830,7 @@ export class CustomerPortalComponent {
     this.selectedComplaint = complaint;
   }
 
-  async updateComplaintStatus(status: 'Closed' | 'Open'): Promise<void> {
+  async updateComplaintStatus(status: 'Closed' | 'Pending'): Promise<void> {
     if (!this.selectedComplaint) {
       return;
     }
@@ -741,6 +839,9 @@ export class CustomerPortalComponent {
   }
 
   async saveProfile(): Promise<void> {
+    if (!this.profileEditMode) {
+      return;
+    }
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
@@ -756,9 +857,27 @@ export class CustomerPortalComponent {
       });
       this.profileMessage = response.message;
       this.syncProfileForm();
+      this.setProfileEditMode(false);
     } catch (error) {
       this.profileMessage = error instanceof Error ? error.message : 'Unable to update profile.';
     }
+  }
+
+  setProfileEditMode(editing: boolean): void {
+    this.profileEditMode = editing;
+    for (const control of Object.values(this.profileForm.controls)) {
+      if (editing && control !== this.profileForm.controls.userId) {
+        control.enable({ emitEvent: false });
+      } else {
+        control.disable({ emitEvent: false });
+      }
+    }
+  }
+
+  cancelProfileEdit(): void {
+    this.syncProfileForm();
+    this.profileMessage = '';
+    this.setProfileEditMode(false);
   }
 
   requestProfileSaveConfirmation(): void {
@@ -784,12 +903,26 @@ export class CustomerPortalComponent {
     }, () => this.logout());
   }
 
-  normalizeDigits(controlName: 'cardNumber' | 'cvv', max: number): void {
+  normalizeDigits(controlName: 'cvv', max: number): void {
     const control = this.paymentForm.controls[controlName];
     const normalized = control.value.replace(/\D/g, '').slice(0, max);
     if (normalized !== control.value) {
       control.setValue(normalized);
     }
+  }
+
+  normalizeCardNumber(): void {
+    const control = this.paymentForm.controls.cardNumber;
+    const digits = control.value.replace(/\D/g, '').slice(0, 16);
+    const formatted = digits.replace(/(.{4})/g, '$1 ').trim();
+    if (formatted !== control.value) {
+      control.setValue(formatted);
+    }
+  }
+
+  normalizeCardholderName(): void {
+    const control = this.paymentForm.controls.cardholderName;
+    control.setValue(control.value.replace(/[^A-Za-z ]/g, '').replace(/\s{2,}/g, ' '), { emitEvent: false });
   }
 
   normalizeExpiry(): void {
@@ -798,6 +931,14 @@ export class CustomerPortalComponent {
     const formatted = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
     if (formatted !== control.value) {
       control.setValue(formatted);
+    }
+  }
+
+  limitTextarea(controlName: 'billingAddress', max: number): void {
+    const control = this.paymentForm.controls[controlName];
+    const normalized = control.value.replace(/\s{3,}/g, ' ').slice(0, max);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
     }
   }
 
@@ -912,6 +1053,7 @@ export class CustomerPortalComponent {
       mobile: user.mobile,
       address: user.address
     });
+    this.setProfileEditMode(this.profileEditMode);
   }
 
   private async initialize(): Promise<void> {
@@ -919,12 +1061,36 @@ export class CustomerPortalComponent {
       this.cities = await this.hotel.getCustomerCities();
       await this.loadHomeRooms();
       await this.hotel.loadCustomerData();
+      this.applyLandingRoomSelection();
       if (!this.eligibleComplaintBookings.length) {
         this.complaintMessage = 'Complaints can be raised from check-in date until 7 days after checkout.';
       }
       this.syncProfileForm();
     } catch {
       this.router.navigate(['/login']);
+    }
+  }
+
+  private applyLandingRoomSelection(): void {
+    const raw = sessionStorage.getItem('hm.selectedLandingRoom');
+    if (!raw) {
+      return;
+    }
+    sessionStorage.removeItem('hm.selectedLandingRoom');
+    try {
+      const selection = JSON.parse(raw) as { hotelCode?: string; roomType?: string; roomNumber?: string };
+      const hotel = this.hotelCards().find((item) => item.hotelCode === selection.hotelCode);
+      if (!hotel) {
+        return;
+      }
+      this.openHotelDetails(hotel);
+      const category = this.selectedHotelRoomCategories()
+        .find((item) => item.roomType === selection.roomType && item.rooms.some((room) => room.roomNumber === selection.roomNumber));
+      if (category) {
+        this.selectRoomCategory(category);
+      }
+    } catch {
+      sessionStorage.removeItem('hm.selectedLandingRoom');
     }
   }
 
@@ -950,6 +1116,15 @@ export class CustomerPortalComponent {
       && this.paymentForm.controls.cvv.valid;
   }
 
+  private paginate<T>(items: T[], page: number, pageSize: number): T[] {
+    const start = (Math.max(1, page) - 1) * pageSize;
+    return items.slice(start, start + pageSize);
+  }
+
+  private totalPages(totalItems: number, pageSize: number): number {
+    return Math.max(1, Math.ceil(totalItems / pageSize));
+  }
+
   private resetHomeJourney(): void {
     this.homeStep.set('listing');
     this.selectedHotelCard.set(null);
@@ -960,8 +1135,37 @@ export class CustomerPortalComponent {
     this.proceedToPaymentAfterCapacityPopup = false;
     this.successData.set(null);
     this.processingPayment.set(false);
+    this.stopPaymentTimer();
     this.bookingMessage = '';
     this.syncCalculatedAmount();
+  }
+
+  private startPaymentTimer(): void {
+    this.stopPaymentTimer();
+    this.paymentExpired = false;
+    this.paymentSecondsRemaining = 300;
+    this.paymentTimerId = setInterval(() => {
+      this.paymentSecondsRemaining -= 1;
+      if (this.paymentSecondsRemaining <= 0) {
+        this.paymentExpired = true;
+        this.stopPaymentTimer();
+        this.bookingMessage = 'Payment session expired. The room hold has been released. Please restart payment.';
+        this.homeStep.set('confirmation');
+      }
+    }, 1000);
+  }
+
+  private stopPaymentTimer(): void {
+    if (this.paymentTimerId) {
+      clearInterval(this.paymentTimerId);
+      this.paymentTimerId = null;
+    }
+  }
+
+  formatPaymentTime(): string {
+    const minutes = Math.floor(this.paymentSecondsRemaining / 60).toString().padStart(2, '0');
+    const seconds = (this.paymentSecondsRemaining % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
   }
 
   private handleCapacityPopup(): void {
@@ -969,6 +1173,16 @@ export class CustomerPortalComponent {
       return;
     }
     const guestCount = Math.max(1, Number(this.confirmationForm.controls.guestCount.value) || 1);
+    if (guestCount > 12) {
+      this.showAdditionalRoomsPopup.set(false);
+      this.proceedToPaymentAfterCapacityPopup = false;
+      if (guestCount !== this.lastGuestLimitPromptCount) {
+        this.showGuestLimitPopup();
+        this.lastGuestLimitPromptCount = guestCount;
+      }
+      return;
+    }
+    this.lastGuestLimitPromptCount = 0;
     if (guestCount > 2) {
       if (guestCount !== this.lastCapacityPromptGuestCount) {
         this.showAdditionalRoomsPopup.set(true);
@@ -980,6 +1194,18 @@ export class CustomerPortalComponent {
     this.lastCapacityPromptGuestCount = 0;
     this.proceedToPaymentAfterCapacityPopup = false;
     this.showAdditionalRoomsPopup.set(false);
+  }
+
+  private showGuestLimitPopup(): void {
+    this.openConfirmationDialog({
+      label: 'GUEST LIMIT',
+      title: 'Enter 12 guests or fewer',
+      message: 'Guest count must be between 1 and 12. Please reduce the guest count before continuing.',
+      confirmText: 'OK',
+      hideCancel: true
+    }, () => {
+      this.confirmationForm.controls.guestCount.markAsTouched();
+    });
   }
 
   private openConfirmationDialog(

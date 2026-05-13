@@ -14,7 +14,12 @@ import com.hm.backend.dto.RoomDtos.RoomResponse;
 import com.hm.backend.dto.RoomDtos.RoomSaveRequest;
 import com.hm.backend.dto.UserDtos.UserStatusUpdateRequest;
 import com.hm.backend.dto.UserDtos.UserSummary;
+import com.hm.backend.dto.PageResponse;
 import com.hm.backend.service.AdminService;
+import com.hm.backend.service.PdfService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +29,11 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final PdfService pdfService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, PdfService pdfService) {
         this.adminService = adminService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/dashboard")
@@ -59,6 +66,20 @@ public class AdminController {
         return adminService.reservations();
     }
 
+    @GetMapping("/reservations/page")
+    public PageResponse<BookingResponse> reservationPage(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "bookedAt") String sort,
+        @RequestParam(defaultValue = "desc") String direction,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String paymentStatus,
+        @RequestParam(required = false) String date
+    ) {
+        return adminService.reservationPage(page, size, sort, direction, search, status, paymentStatus, date);
+    }
+
     @PostMapping("/reservations")
     public ApiResponse createReservation(@RequestBody BookingCreateRequest request) {
         return adminService.createReservation(request);
@@ -67,6 +88,18 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserSummary> users() {
         return adminService.users();
+    }
+
+    @GetMapping("/users/page")
+    public PageResponse<UserSummary> userPage(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "userId") String sort,
+        @RequestParam(defaultValue = "asc") String direction,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String role
+    ) {
+        return adminService.userPage(page, size, sort, direction, search, role);
     }
 
     @PatchMapping("/users/{userCode}/status")
@@ -92,5 +125,14 @@ public class AdminController {
     @PatchMapping("/complaints/{complaintCode}")
     public ApiResponse updateComplaint(@PathVariable String complaintCode, @RequestBody ComplaintUpdateRequest request) {
         return adminService.updateComplaint(complaintCode, request);
+    }
+
+    @GetMapping("/reservations/{bookingCode}/receipt")
+    public ResponseEntity<byte[]> bookingReceipt(@PathVariable String bookingCode) {
+        byte[] pdf = pdfService.bookingReceipt(bookingCode);
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bookingCode + "-receipt.pdf\"")
+            .body(pdf);
     }
 }

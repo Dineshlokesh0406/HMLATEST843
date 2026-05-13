@@ -134,6 +134,10 @@
   font-weight: 600;
 }
 
+.pager-arrow {
+  min-width: 3rem;
+}
+
 .pagination-footer {
   justify-content: center;
 }
@@ -147,7 +151,6 @@
 .summary-card {
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 20px;
   padding: 1rem;
 }
 
@@ -252,14 +255,12 @@
 
 .room-meta span {
   background: rgba(148, 163, 184, 0.12);
-  border-radius: 999px;
   padding: 0.45rem 0.75rem;
 }
 
 .payment-page {
   background: rgba(15, 23, 42, 0.78);
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 20px;
   color: #e2e8f0;
   margin: 0 auto;
   max-width: 1280px;
@@ -299,7 +300,6 @@
 .payment-reference-card {
   background: rgba(15, 23, 42, 0.82);
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 16px;
   padding: 0.8rem;
 }
 
@@ -379,7 +379,6 @@
   background: rgba(2, 6, 23, 0.3);
   border: 1px solid rgba(148, 163, 184, 0.16);
   color: #cbd5e1;
-  border-radius: 12px;
   font-size: 0.82rem;
   font-weight: 600;
   margin-top: 0.55rem;
@@ -419,7 +418,6 @@
 .payment-method-form textarea,
 .payment-card-form input,
 .payment-card-form textarea {
-  border-radius: 12px;
   font-size: 0.86rem;
   min-height: 36px;
   padding: 0.45rem 0.65rem;
@@ -441,15 +439,15 @@
 }
 
 .payment-edit-button {
-  background: rgba(245, 158, 11, 0.14);
-  border-color: #f59e0b;
-  color: #fde68a;
+  background: #bae6fd;
+  border-color: rgba(14, 165, 233, 0.35);
+  color: #082f49;
 }
 
 .payment-back-button {
-  background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.22);
-  color: #e2e8f0;
+  background: #bae6fd;
+  border-color: rgba(14, 165, 233, 0.35);
+  color: #082f49;
 }
 
 .summary-card p {
@@ -469,7 +467,6 @@
   animation: spin 0.9s linear infinite;
   border: 4px solid rgba(148, 163, 184, 0.16);
   border-top-color: #f59e0b;
-  border-radius: 999px;
   display: inline-block;
   height: 42px;
   width: 42px;
@@ -477,7 +474,6 @@
 
 .success-panel img {
   background: #fff;
-  border-radius: 16px;
   max-width: 180px;
   padding: 0.5rem;
 }
@@ -502,7 +498,6 @@
 .overlay-card {
   background: rgba(15, 23, 42, 0.96);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 20px;
   color: #e2e8f0;
   box-shadow: 0 24px 60px rgba(2, 6, 23, 0.5);
   max-width: 780px;
@@ -544,7 +539,6 @@
   align-items: center;
   background: transparent;
   border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 12px;
   color: #f8fafc;
   cursor: pointer;
   display: inline-flex;
@@ -678,3 +672,4 @@
     transform: rotate(360deg);
   }
 }
+

@@ -26,7 +26,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT chk_users_name CHECK (CHAR_LENGTH(TRIM(full_name)) >= 3),
     CONSTRAINT chk_users_email CHECK (email = LOWER(TRIM(email))),
-    CONSTRAINT chk_users_phone CHECK (phone_number REGEXP '^[6-9][0-9]{7,9}$')
+    CONSTRAINT chk_users_phone CHECK (phone_number REGEXP '^[0-9]{9,10}$')
 );
 
 CREATE TABLE cities (
@@ -184,13 +184,15 @@ CREATE TABLE complaints (
     complaint_title VARCHAR(100) NOT NULL,
     complaint_description VARCHAR(500) NOT NULL,
     contact_preference ENUM('CALL', 'EMAIL') NOT NULL,
-    complaint_status ENUM('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL DEFAULT 'OPEN',
+    complaint_status ENUM('PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL DEFAULT 'PENDING',
     assigned_to BIGINT NULL,
     expected_resolution_date DATE NULL,
     response_text VARCHAR(500) NULL,
     resolution_notes VARCHAR(500) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    assigned_at DATETIME NULL,
+    resolved_at DATETIME NULL,
     closed_at DATETIME NULL,
     CONSTRAINT fk_complaints_customer
         FOREIGN KEY (customer_id) REFERENCES users(user_id),
@@ -206,8 +208,8 @@ CREATE TABLE complaint_actions (
     action_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     complaint_id BIGINT NOT NULL,
     action_by BIGINT NOT NULL,
-    previous_status ENUM('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NULL,
-    new_status ENUM('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL,
+    previous_status ENUM('PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NULL,
+    new_status ENUM('PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL,
     action_note VARCHAR(500) NOT NULL,
     action_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_complaint_actions_complaint
@@ -226,3 +228,17 @@ CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_bills_customer ON bills(customer_id);
 CREATE INDEX idx_complaints_customer_status ON complaints(customer_id, complaint_status);
 CREATE INDEX idx_complaints_assigned_to ON complaints(assigned_to);
+
+CREATE TABLE password_reset_tokens (
+    reset_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    otp_hash CHAR(64) NOT NULL,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_password_reset_user
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE INDEX idx_password_reset_user_active ON password_reset_tokens(user_id, used_at, expires_at);

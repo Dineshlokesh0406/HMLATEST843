@@ -101,12 +101,41 @@ public class BookingRepository {
         return jdbcTemplate.query(baseBookingQuery() + " order by b.booked_at desc", bookingRowMapper());
     }
 
-    public void updateBooking(String bookingCode, LocalDate checkIn, LocalDate checkOut, int adults, int children, long roomId) {
+    public List<BookingResponse> findAllBookingsPage(int limit, int offset, String sortColumn, String sortDirection,
+                                                     String search, String status, String paymentStatus, String date) {
+        return jdbcTemplate.query(
+            baseBookingQuery() + bookingWhereClause(search, status, paymentStatus, date)
+                + " order by " + sortColumn + " " + sortDirection + " limit ? offset ?",
+            bookingRowMapper(),
+            limit,
+            offset
+        );
+    }
+
+    public long countBookings(String search, String status, String paymentStatus, String date) {
+        Long count = jdbcTemplate.queryForObject(
+            """
+                select count(*)
+                from bookings b
+                join users u on u.user_id = b.customer_id
+                join rooms r on r.room_id = b.room_id
+                join hotels h on h.hotel_id = r.hotel_id
+                join cities c on c.city_id = h.city_id
+                """ + bookingWhereClause(search, status, paymentStatus, date),
+            Long.class
+        );
+        return count == null ? 0 : count;
+    }
+
+    public void updateBooking(String bookingCode, LocalDate checkIn, LocalDate checkOut, int adults, int children, long roomId, BigDecimal totalAmount) {
         long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
+        BigDecimal baseAmount = totalAmount.divide(BigDecimal.valueOf(1.18), 2, java.math.RoundingMode.HALF_UP);
+        BigDecimal taxAmount = totalAmount.subtract(baseAmount);
         jdbcTemplate.update(
             """
                 update bookings
-                set check_in_date = ?, check_out_date = ?, adults_count = ?, children_count = ?, room_id = ?, total_nights = ?
+                set check_in_date = ?, check_out_date = ?, adults_count = ?, children_count = ?, room_id = ?,
+                    total_nights = ?, base_amount = ?, tax_amount = ?, total_amount = ?
                 where booking_code = ?
                 """,
             Date.valueOf(checkIn),
@@ -115,6 +144,9 @@ public class BookingRepository {
             children,
             roomId,
             nights,
+            baseAmount,
+            taxAmount,
+            totalAmount,
             bookingCode
         );
     }
@@ -167,6 +199,48 @@ public class BookingRepository {
         );
     }
 
+    public BookingInvoiceDetails findInvoiceDetails(String bookingCode) {
+        return jdbcTemplate.queryForObject(
+            """
+                select b.booking_code, coalesce(p.gateway_reference, concat('TXN-', b.booking_code)) as transaction_id,
+                       u.user_code, u.full_name, u.email, u.country_code, u.phone_number,
+                       c.city_name, h.hotel_name, r.room_number, r.room_type,
+                       b.check_in_date, b.check_out_date, b.payment_status, b.base_amount, b.tax_amount,
+                       b.discount_amount, b.total_amount
+                from bookings b
+                join users u on u.user_id = b.customer_id
+                join rooms r on r.room_id = b.room_id
+                join hotels h on h.hotel_id = r.hotel_id
+                join cities c on c.city_id = h.city_id
+                left join payments p on p.booking_id = b.booking_id and p.payment_status = 'SUCCESS'
+                where b.booking_code = ?
+                order by p.payment_id desc
+                limit 1
+                """,
+            (rs, rowNum) -> new BookingInvoiceDetails(
+                rs.getString("booking_code"),
+                rs.getString("transaction_id"),
+                rs.getString("user_code"),
+                rs.getString("full_name"),
+                rs.getString("email"),
+                rs.getString("country_code"),
+                rs.getString("phone_number"),
+                rs.getString("city_name"),
+                rs.getString("hotel_name"),
+                rs.getString("room_number"),
+                rs.getString("room_type"),
+                rs.getDate("check_in_date").toLocalDate(),
+                rs.getDate("check_out_date").toLocalDate(),
+                rs.getString("payment_status"),
+                rs.getBigDecimal("base_amount"),
+                rs.getBigDecimal("tax_amount"),
+                rs.getBigDecimal("discount_amount"),
+                rs.getBigDecimal("total_amount")
+            ),
+            bookingCode
+        );
+    }
+
     public int countBookings() {
         Integer count = jdbcTemplate.queryForObject("select count(*) from bookings", Integer.class);
         return count == null ? 0 : count;
@@ -210,6 +284,26 @@ public class BookingRepository {
             """;
     }
 
+    private String bookingWhereClause(String search, String status, String paymentStatus, String date) {
+        StringBuilder where = new StringBuilder(" where 1=1 ");
+        if (search != null && !search.isBlank()) {
+            String escaped = search.trim().replace("'", "''").toLowerCase();
+            where.append(" and (lower(b.booking_code) like '%").append(escaped)
+                .append("%' or lower(u.full_name) like '%").append(escaped)
+                .append("%' or lower(r.room_number) like '%").append(escaped).append("%') ");
+        }
+        if (status != null && !status.isBlank()) {
+            where.append(" and b.booking_status = '").append(status.trim().toUpperCase().replace(" ", "_").replace("'", "''")).append("' ");
+        }
+        if (paymentStatus != null && !paymentStatus.isBlank()) {
+            where.append(" and b.payment_status = '").append(paymentStatus.trim().toUpperCase().replace(" ", "_").replace("'", "''")).append("' ");
+        }
+        if (date != null && !date.isBlank()) {
+            where.append(" and '").append(date.trim().replace("'", "''")).append("' between b.check_in_date and b.check_out_date ");
+        }
+        return where.toString();
+    }
+
     public record BookingDetails(
         long bookingId,
         String bookingCode,
@@ -227,6 +321,28 @@ public class BookingRepository {
         int adultsCount,
         int childrenCount,
         String bookingStatus,
+        BigDecimal totalAmount
+    ) {
+    }
+
+    public record BookingInvoiceDetails(
+        String bookingCode,
+        String transactionId,
+        String userCode,
+        String fullName,
+        String email,
+        String countryCode,
+        String phoneNumber,
+        String cityName,
+        String hotelName,
+        String roomNumber,
+        String roomType,
+        LocalDate checkInDate,
+        LocalDate checkOutDate,
+        String paymentStatus,
+        BigDecimal baseAmount,
+        BigDecimal taxAmount,
+        BigDecimal discountAmount,
         BigDecimal totalAmount
     ) {
     }

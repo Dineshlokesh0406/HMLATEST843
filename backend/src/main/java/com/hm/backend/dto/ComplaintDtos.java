@@ -35,7 +35,10 @@ public final class ComplaintDtos {
         String assignedToUserCode,
         String expectedResolutionDate,
         String responseText,
-        String resolutionNotes
+        String resolutionNotes,
+        String createdAt,
+        String assignedAt,
+        String resolvedAt
     ) {
     }
 }

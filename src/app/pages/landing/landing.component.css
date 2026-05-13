@@ -58,7 +58,6 @@
 .room-card {
   background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 22px;
   overflow: hidden;
   padding: 0 0 1.25rem;
 }
@@ -132,7 +131,6 @@
 
 .room-meta span {
   background: rgba(148, 163, 184, 0.12);
-  border-radius: 999px;
   padding: 0.45rem 0.75rem;
 }
 
@@ -168,3 +166,4 @@
     grid-template-columns: 1fr;
   }
 }
+

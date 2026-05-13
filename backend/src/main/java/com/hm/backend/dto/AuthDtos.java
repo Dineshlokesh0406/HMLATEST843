@@ -20,6 +20,12 @@ public final class AuthDtos {
     public record LoginRequest(String role, String usernameOrEmail, String password) {
     }
 
+    public record ForgotPasswordRequest(String username, String email, String phoneNumber) {
+    }
+
+    public record ResetPasswordRequest(String token, String newPassword, String confirmPassword) {
+    }
+
     public record AuthResponse(
         String message,
         String userCode,
@@ -28,4 +34,8 @@ public final class AuthDtos {
         String role
     ) {
     }
+
+    public record PasswordResetStartResponse(String message, String resetToken, String tokenExpiresAt) {
+    }
+
 }

@@ -2,7 +2,7 @@ export type UserRole = 'customer' | 'admin' | 'staff';
 export type AccountStatus = 'Active' | 'Inactive' | 'Locked';
 export type BookingStatus = 'Confirmed' | 'Checked-in' | 'Checked-out' | 'Canceled';
 export type PaymentStatus = 'Paid' | 'Pending' | 'Partially Paid';
-export type ComplaintStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+export type ComplaintStatus = 'Pending' | 'Assigned' | 'In Progress' | 'Resolved' | 'Closed';
 
 export interface AppUser {
   userId: string;
@@ -94,6 +94,8 @@ export interface Complaint {
   response?: string;
   resolutionNotes?: string;
   assignedTo?: string;
+  assignedAt?: string;
+  resolvedAt?: string;
   priority: 'Low' | 'Medium' | 'High';
 }
 

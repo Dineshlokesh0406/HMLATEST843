@@ -14,6 +14,10 @@ import com.hm.backend.dto.RoomDtos.RoomSearchRequest;
 import com.hm.backend.dto.UserDtos.ProfileUpdateRequest;
 import com.hm.backend.dto.UserDtos.UserSummary;
 import com.hm.backend.service.CustomerService;
+import com.hm.backend.service.PdfService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +27,11 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final PdfService pdfService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, PdfService pdfService) {
         this.customerService = customerService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/profile/{userCode}")
@@ -79,6 +85,15 @@ public class CustomerController {
     @PostMapping("/bookings/{bookingCode}/cancel")
     public ApiResponse cancelBooking(@PathVariable String bookingCode) {
         return customerService.cancelBooking(bookingCode);
+    }
+
+    @GetMapping("/bookings/{bookingCode}/receipt")
+    public ResponseEntity<byte[]> bookingReceipt(@PathVariable String bookingCode) {
+        byte[] pdf = pdfService.bookingReceipt(bookingCode);
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bookingCode + "-receipt.pdf\"")
+            .body(pdf);
     }
 
     @GetMapping("/complaints/{customerCode}")
